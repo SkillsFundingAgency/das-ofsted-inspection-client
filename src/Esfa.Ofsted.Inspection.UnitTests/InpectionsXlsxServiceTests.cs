@@ -1,4 +1,5 @@
 ﻿using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client.Services;
 using NUnit.Framework;
 
 namespace Sfa.Das.Ofsted.Inspection.UnitTests
@@ -9,7 +10,7 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
         [Test]
         public void ShouldReturnResultsWithoutErroring()
         {
-            var getOfstedInspections = new GetOfstedInspections();
+            var getOfstedInspections = new GetOfstedInspections(new ProcessExcelFormulaToLink());
 
             var res = getOfstedInspections.GetAll();
 

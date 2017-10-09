@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Remoting.Messaging;
+using Esfa.Ofsted.Inspection.Client.Services;
 using OfficeOpenXml;
+using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
@@ -14,6 +17,17 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private const int WebLinkPosition = 1;
         private const int DatePublishedPosition = 16;
         private const int OverallEffectivenessPosition = 17;
+
+        private IProcessExcelFormulaToLink _processExcelFormulaToLink;
+
+        public GetOfstedInspections(IProcessExcelFormulaToLink processExcelFormulaToLink)
+        {
+            _processExcelFormulaToLink = processExcelFormulaToLink;
+        }
+
+        public GetOfstedInspections()
+        {
+        }
 
         public List<Sfa.Das.Ofsted.Inspection.Types.Inspection> GetAll()
         {
@@ -48,20 +62,46 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
                     ? keyWorksheet.Cells[i, UkprnPosition].Value.ToString()
                     : string.Empty;
                 int ukprn;
-                if (!string.IsNullOrEmpty(ukprnString) && int.TryParse(ukprnString, out ukprn))
+
+
+                if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn)) continue;
+
+                var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[i, WebLinkPosition].Formula);
+
+                var overallEffectiveness = OverallEffectivenessProcessor(keyWorksheet.Cells[i, OverallEffectivenessPosition]);
+
+
+                var inspectionData = new Sfa.Das.Ofsted.Inspection.Types.Inspection
                 {
-                    var inspectionData = new Sfa.Das.Ofsted.Inspection.Types.Inspection
-                    {
-                        Ukprn = ukprn,
-                        Website = keyWorksheet.Cells[i, WebLinkPosition].Value != null ? keyWorksheet.Cells[i, WebLinkPosition].Value.ToString() : string.Empty,
-                        DatePublished = GetDateTimeValue(keyWorksheet.Cells[i, DatePublishedPosition]),
-                        OverallEffectiveness = keyWorksheet.Cells[i, OverallEffectivenessPosition].Value != null ? keyWorksheet.Cells[i, OverallEffectivenessPosition].Value.ToString() : string.Empty,
-                    };
+                    Ukprn = ukprn,
+                    Website = url,
+                    DatePublished = GetDateTimeValue(keyWorksheet.Cells[i, DatePublishedPosition]),
+                    OverallEffectiveness = overallEffectiveness
+                };
 
-                    inspections.Add(inspectionData);
-                }
-
+                inspections.Add(inspectionData);
             }
+        }
+
+        private static OverallEffectiveness OverallEffectivenessProcessor(ExcelRange cell)
+        {
+            if (cell?.Value == null) return OverallEffectiveness.NotJudged;
+            var overallEffectivessString = cell.Value.ToString();
+
+            switch (overallEffectivessString)
+            {
+                case "1":
+                    return OverallEffectiveness.Outstanding;
+                case "2":
+                    return OverallEffectiveness.Good;
+                case "3":
+                    return OverallEffectiveness.RequiresImprovement;
+                case "4":
+                    return OverallEffectiveness.Inadequate;
+                case "9":
+                    return OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert;
+            }
+            return OverallEffectiveness.NotJudged;
         }
 
         private static DateTime GetDateTimeValue(ExcelRange excelRange)
