@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Remoting.Messaging;
+using AngleSharp.Dom.Html;
+using AngleSharp.Parser.Html;
 using Esfa.Ofsted.Inspection.Client.Services;
 using OfficeOpenXml;
-using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
@@ -18,36 +18,67 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private const int DatePublishedPosition = 16;
         private const int OverallEffectivenessPosition = 17;
 
-        private IProcessExcelFormulaToLink _processExcelFormulaToLink;
-
-        public GetOfstedInspections(IProcessExcelFormulaToLink processExcelFormulaToLink)
+        private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
+        private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
+        public GetOfstedInspections(IProcessExcelFormulaToLink processExcelFormulaToLink, IOverallEffectivenessProcessor overallEffectivenessProcessor)
         {
             _processExcelFormulaToLink = processExcelFormulaToLink;
+            _overallEffectivenessProcessor = overallEffectivenessProcessor;
         }
 
-        public GetOfstedInspections()
+        public GetOfstedInspections(IOverallEffectivenessProcessor overallEffectivenessProcessor)
         {
+            _overallEffectivenessProcessor = overallEffectivenessProcessor;
         }
 
         public List<Sfa.Das.Ofsted.Inspection.Types.Inspection> GetAll()
         {
             var inspections = new List<Sfa.Das.Ofsted.Inspection.Types.Inspection>();
+
+            var url = "https://www.gov.uk/government/statistical-data-sets/monthly-management-information-ofsteds-further-education-and-skills-inspections-outcomes-from-december-2015";
+
+            var urlOfSpreadsheet = GetLinkForLatestSpreadsheet(url);
+
             using (var client = new WebClient())
             {
                 using (var stream =
-                    new MemoryStream(client.DownloadData(
-                        new Uri(
-                            "https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/643394/Management_information_-_further_education_and_skills_-_as_at_31_August_2017.xlsx")))
-                )
+                    new MemoryStream(client.DownloadData(new Uri(urlOfSpreadsheet))))
                 {
                     using (var package = new ExcelPackage(stream))
                     {
-
                         GetOsftedInspections(package, inspections);
                     }
                 }
             }
             return inspections;
+        }
+
+        private static string GetLinkForLatestSpreadsheet(string url)
+        {
+            var urlOfSpreadsheet = string.Empty;
+            using (var client = new WebClient())
+            {
+                client.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
+
+                Uri uriResult;
+                Uri.TryCreate(url, UriKind.Absolute, out uriResult);
+
+                var absolutePath = uriResult.AbsolutePath;
+
+                var urlDetails = client.DownloadString(url);
+                var parser = new HtmlParser();
+                var result = parser.Parse(urlDetails);
+                var allAnchorTags = result.QuerySelectorAll("a").OfType<IHtmlAnchorElement>();
+
+                var firstManagementInformationTag = allAnchorTags
+                    .Where(x => x.InnerHtml.Contains("Management information")).Select(x => x.GetAttribute("href"))
+                    .First();
+
+                urlOfSpreadsheet =
+                    $"{uriResult.Scheme}://{uriResult.Host}{firstManagementInformationTag}"; 
+            }
+
+            return urlOfSpreadsheet;
         }
 
         private void GetOsftedInspections(ExcelPackage package,
@@ -67,9 +98,8 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
                 if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn)) continue;
 
                 var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[i, WebLinkPosition].Formula);
-
-                var overallEffectiveness = OverallEffectivenessProcessor(keyWorksheet.Cells[i, OverallEffectivenessPosition]);
-
+                var overallEffectivenessString = keyWorksheet.Cells[i, OverallEffectivenessPosition]?.Value?.ToString();
+                var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
 
                 var inspectionData = new Sfa.Das.Ofsted.Inspection.Types.Inspection
                 {
@@ -83,30 +113,9 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             }
         }
 
-        private static OverallEffectiveness OverallEffectivenessProcessor(ExcelRange cell)
-        {
-            if (cell?.Value == null) return OverallEffectiveness.NotJudged;
-            var overallEffectivessString = cell.Value.ToString();
-
-            switch (overallEffectivessString)
-            {
-                case "1":
-                    return OverallEffectiveness.Outstanding;
-                case "2":
-                    return OverallEffectiveness.Good;
-                case "3":
-                    return OverallEffectiveness.RequiresImprovement;
-                case "4":
-                    return OverallEffectiveness.Inadequate;
-                case "9":
-                    return OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert;
-            }
-            return OverallEffectiveness.NotJudged;
-        }
-
         private static DateTime GetDateTimeValue(ExcelRange excelRange)
         {
-            if (excelRange == null) throw new ArgumentNullException(nameof(excelRange));
+            if (excelRange?.Value == null) throw new ArgumentNullException(nameof(excelRange));
             var value = excelRange.Value.ToString();
             return DateTime.Parse(value);
         }
