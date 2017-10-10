@@ -6,6 +6,7 @@ using System.Net;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using Esfa.Ofsted.Inspection.Client.Services;
+using Esfa.Ofsted.Inspection.Client.Services.interfaces;
 using OfficeOpenXml;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
@@ -20,29 +21,31 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 
         private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
         private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
-        public GetOfstedInspections(IProcessExcelFormulaToLink processExcelFormulaToLink, IOverallEffectivenessProcessor overallEffectivenessProcessor)
+        private readonly IAngleSharpService _angleSharpService;
+
+        private const string Url = "https://www.gov.uk/government/statistical-data-sets/monthly-management-information-ofsteds-further-education-and-skills-inspections-outcomes-from-december-2015";
+        private const string TextOfLink = "Management information";
+        private const string WorksheetOfSpreadsheetToUse = "D1 In-year inspection data";
+
+        public GetOfstedInspections(IProcessExcelFormulaToLink processExcelFormulaToLink, 
+                                    IOverallEffectivenessProcessor overallEffectivenessProcessor, 
+                                    IAngleSharpService angleSharpService)
         {
             _processExcelFormulaToLink = processExcelFormulaToLink;
             _overallEffectivenessProcessor = overallEffectivenessProcessor;
-        }
-
-        public GetOfstedInspections(IOverallEffectivenessProcessor overallEffectivenessProcessor)
-        {
-            _overallEffectivenessProcessor = overallEffectivenessProcessor;
+            _angleSharpService = angleSharpService;
         }
 
         public List<Sfa.Das.Ofsted.Inspection.Types.Inspection> GetAll()
         {
-            var inspections = new List<Sfa.Das.Ofsted.Inspection.Types.Inspection>();
-
-            var url = "https://www.gov.uk/government/statistical-data-sets/monthly-management-information-ofsteds-further-education-and-skills-inspections-outcomes-from-december-2015";
-
-            var urlOfSpreadsheet = GetLinkForLatestSpreadsheet(url);
+            var inspections = new List<Sfa.Das.Ofsted.Inspection.Types.Inspection>();        
+            var getFirstMatchingLink = _angleSharpService.GetLinks(Url, "a",TextOfLink).First();
+            var firstLinkUrl = BuildFirstLinkUrl(getFirstMatchingLink);
 
             using (var client = new WebClient())
             {
                 using (var stream =
-                    new MemoryStream(client.DownloadData(new Uri(urlOfSpreadsheet))))
+                    new MemoryStream(client.DownloadData(new Uri(firstLinkUrl))))
                 {
                     using (var package = new ExcelPackage(stream))
                     {
@@ -53,38 +56,18 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             return inspections;
         }
 
-        private static string GetLinkForLatestSpreadsheet(string url)
+        private static string BuildFirstLinkUrl(string getFirstMatchingLink)
         {
-            var urlOfSpreadsheet = string.Empty;
-            using (var client = new WebClient())
-            {
-                client.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-
-                Uri uriResult;
-                Uri.TryCreate(url, UriKind.Absolute, out uriResult);
-
-                var absolutePath = uriResult.AbsolutePath;
-
-                var urlDetails = client.DownloadString(url);
-                var parser = new HtmlParser();
-                var result = parser.Parse(urlDetails);
-                var allAnchorTags = result.QuerySelectorAll("a").OfType<IHtmlAnchorElement>();
-
-                var firstManagementInformationTag = allAnchorTags
-                    .Where(x => x.InnerHtml.Contains("Management information")).Select(x => x.GetAttribute("href"))
-                    .First();
-
-                urlOfSpreadsheet =
-                    $"{uriResult.Scheme}://{uriResult.Host}{firstManagementInformationTag}"; 
-            }
-
-            return urlOfSpreadsheet;
+            Uri uriResult;
+            Uri.TryCreate(Url, UriKind.Absolute, out uriResult);
+            var firstLinkUrl = $"{uriResult.Scheme}://{uriResult.Host}{getFirstMatchingLink}";
+            return firstLinkUrl;
         }
 
-        private void GetOsftedInspections(ExcelPackage package,
-            List<Sfa.Das.Ofsted.Inspection.Types.Inspection> inspections)
+
+        private void GetOsftedInspections(ExcelPackage package, ICollection<Sfa.Das.Ofsted.Inspection.Types.Inspection> inspections)
         {
-            var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == "D1 In-year inspection data");
+            var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == WorksheetOfSpreadsheetToUse);
             if (keyWorksheet == null) return;
 
             for (var i = keyWorksheet.Dimension.Start.Row + 1; i <= keyWorksheet.Dimension.End.Row; i++)
@@ -93,8 +76,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
                     ? keyWorksheet.Cells[i, UkprnPosition].Value.ToString()
                     : string.Empty;
                 int ukprn;
-
-
+                
                 if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn)) continue;
 
                 var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[i, WebLinkPosition].Formula);

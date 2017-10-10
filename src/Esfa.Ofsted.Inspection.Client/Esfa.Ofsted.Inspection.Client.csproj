@@ -52,8 +52,12 @@
     <Compile Include="ApplicationServices\GetOfstedInspections.cs" />
     <Compile Include="ApplicationServices\IGetOfstedInspections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IOverallEffectivenessProcessor.cs" />
-    <Compile Include="Services\IProcessExcelFormulaToLink.cs" />
+    <Compile Include="Services\HttpService.cs" />
+    <Compile Include="Services\interfaces\IAngleSharpService.cs" />
+    <Compile Include="Services\interfaces\IHttpGet.cs" />
+    <Compile Include="Services\interfaces\IOverallEffectivenessProcessor.cs" />
+    <Compile Include="Services\interfaces\IProcessExcelFormulaToLink.cs" />
+    <Compile Include="Services\AngleSharpService.cs" />
     <Compile Include="Services\OverallEffectivenessProcessor.cs" />
     <Compile Include="Services\ProcessExcelFormulaToLink.cs" />
   </ItemGroup>

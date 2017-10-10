@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AngleSharpServiceTests.cs" />
     <Compile Include="InpectionsXlsxServiceTests.cs" />
     <Compile Include="OverallEffectivenessProcessorTests.cs" />
     <Compile Include="ProcessExcelFormulaToLinkTests.cs" />

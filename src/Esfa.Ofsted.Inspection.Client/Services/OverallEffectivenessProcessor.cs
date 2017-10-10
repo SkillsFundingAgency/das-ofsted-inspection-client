@@ -1,4 +1,5 @@
-﻿using Sfa.Das.Ofsted.Inspection.Types;
+﻿using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {

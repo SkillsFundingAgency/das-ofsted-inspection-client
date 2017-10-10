@@ -1,6 +1,6 @@
 using Sfa.Das.Ofsted.Inspection.Types;
 
-namespace Esfa.Ofsted.Inspection.Client.Services
+namespace Esfa.Ofsted.Inspection.Client.Services.interfaces
 {
     public interface IOverallEffectivenessProcessor
     {
