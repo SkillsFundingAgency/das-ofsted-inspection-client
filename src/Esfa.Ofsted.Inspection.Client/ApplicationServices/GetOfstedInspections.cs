@@ -8,6 +8,7 @@ using AngleSharp.Parser.Html;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.interfaces;
 using OfficeOpenXml;
+using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
@@ -36,7 +37,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             _angleSharpService = angleSharpService;
         }
 
-        public List<Sfa.Das.Ofsted.Inspection.Types.Inspection> GetAll()
+        public InspectionsDetail GetAll()
         {
             var inspections = new List<Sfa.Das.Ofsted.Inspection.Types.Inspection>();        
             var getFirstMatchingLink = _angleSharpService.GetLinks(Url, "a",TextOfLink).First();
@@ -49,11 +50,11 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
                 {
                     using (var package = new ExcelPackage(stream))
                     {
-                        GetOsftedInspections(package, inspections);
+                        inspections = GetOsftedInspections(package);
                     }
                 }
             }
-            return inspections;
+            return new InspectionsDetail { Inspections = inspections, StatusCode = InspectionsStatusCode.Success, ErrorSet = null};
         }
 
         private static string BuildFirstLinkUrl(string getFirstMatchingLink)
@@ -65,10 +66,11 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         }
 
 
-        private void GetOsftedInspections(ExcelPackage package, ICollection<Sfa.Das.Ofsted.Inspection.Types.Inspection> inspections)
+        private List<Sfa.Das.Ofsted.Inspection.Types.Inspection> GetOsftedInspections(ExcelPackage package)
         {
+            var inspections = new List<Sfa.Das.Ofsted.Inspection.Types.Inspection>();
             var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == WorksheetOfSpreadsheetToUse);
-            if (keyWorksheet == null) return;
+            if (keyWorksheet == null) return inspections;
 
             for (var i = keyWorksheet.Dimension.Start.Row + 1; i <= keyWorksheet.Dimension.End.Row; i++)
             {
@@ -93,6 +95,8 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 
                 inspections.Add(inspectionData);
             }
+
+            return inspections;
         }
 
         private static DateTime GetDateTimeValue(ExcelRange excelRange)

@@ -32,8 +32,7 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
                 new GetOfstedInspections(mockProcessExcelFormulaToLink.Object, mockOverallEffectivenessProcessor.Object, mockAngleSharpService.Object);
 
             var res = getOfstedInspections.GetAll();
-
-
+            
             Assert.IsTrue(true);
 
         }

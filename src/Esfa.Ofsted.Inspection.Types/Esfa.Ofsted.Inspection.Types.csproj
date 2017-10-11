@@ -45,7 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InspectionsStatusCode.cs" />
     <Compile Include="Inspection.cs" />
+    <Compile Include="InspectionError.cs" />
+    <Compile Include="InspectionsDetail.cs" />
     <Compile Include="OverallEffectiveness.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

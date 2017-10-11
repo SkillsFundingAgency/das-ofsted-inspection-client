@@ -32,7 +32,6 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return allMatchingItems
                 .Where(x => x.InnerHtml.Contains(textInTitle)).Select(x => x.GetAttribute("href"))
                 .ToList();
-
         }
     }
 }
