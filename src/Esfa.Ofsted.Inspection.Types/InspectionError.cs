@@ -2,7 +2,7 @@
 {
    public  class InspectionError
     {
-        private int? LineNumber { get; set; }
-        private string Message { get; set; }
+        public int LineNumber { get; set; }
+        public string Message { get; set; }
     }
 }

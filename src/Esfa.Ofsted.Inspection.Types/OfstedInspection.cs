@@ -2,7 +2,7 @@
 
 namespace Sfa.Das.Ofsted.Inspection.Types
 {
-    public class Inspection
+    public class OfstedInspection
     {
         public string Website { get; set; }
         public int Ukprn { get; set; }

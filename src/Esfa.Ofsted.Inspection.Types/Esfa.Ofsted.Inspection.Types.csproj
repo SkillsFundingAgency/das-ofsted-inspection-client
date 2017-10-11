@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InspectionsStatusCode.cs" />
-    <Compile Include="Inspection.cs" />
+    <Compile Include="OfstedInspection.cs" />
     <Compile Include="InspectionError.cs" />
     <Compile Include="InspectionsDetail.cs" />
     <Compile Include="OverallEffectiveness.cs" />
