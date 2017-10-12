@@ -42,9 +42,15 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                     : string.Empty;
                 int ukprn;
 
-                if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn)) continue;
+                if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn))
+                {
+                    errorSet.Add(new InspectionError { LineNumber = i, Message = $"ukprn not a valid int: [{ukprnString}]" });
+                    continue;
+                    
+                }
 
                 var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[i, WebLinkPosition].Formula);
+                
                 var overallEffectivenessString = keyWorksheet.Cells[i, OverallEffectivenessPosition]?.Value?.ToString();
                 var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
                 var datePublished = GetDateTimeValue(keyWorksheet.Cells[i, DatePublishedPosition]);
