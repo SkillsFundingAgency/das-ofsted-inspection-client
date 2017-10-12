@@ -1,4 +1,5 @@
-﻿using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
@@ -19,8 +20,12 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                     return OverallEffectiveness.Inadequate;
                 case "9":
                     return OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert;
-                default:
+                case "-":
                     return OverallEffectiveness.NotJudged;
+                case null:
+                    return OverallEffectiveness.NotJudged;
+                default:
+                    throw new UnmatchedEffectivenessException($"Invalid Overall Effectiveness: [{overallEffectivenessString}]");
             }        
         }
     }

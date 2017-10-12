@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AngleSharpServiceTests.cs" />
+    <Compile Include="GetInspectionServiceTests.cs" />
     <Compile Include="GetOfstedInspectionsTests.cs" />
     <Compile Include="OverallEffectivenessProcessorTests.cs" />
     <Compile Include="ProcessExcelFormulaToLinkTests.cs" />

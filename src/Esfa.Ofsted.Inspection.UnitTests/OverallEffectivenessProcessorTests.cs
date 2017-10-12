@@ -1,4 +1,5 @@
-﻿using Esfa.Ofsted.Inspection.Client.Services;
+﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
+using Esfa.Ofsted.Inspection.Client.Services;
 using NUnit.Framework;
 using Sfa.Das.Ofsted.Inspection.Types;
 
@@ -14,14 +15,22 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
         [TestCase("9", OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert)]
         [TestCase("-", OverallEffectiveness.NotJudged)]
         [TestCase((string) null, OverallEffectiveness.NotJudged)]
-        [TestCase("", OverallEffectiveness.NotJudged)]
-        [TestCase("sdv", OverallEffectiveness.NotJudged)]
-
-        public void ShouldReturnStringModifiedForUrlUsage(string inputText, OverallEffectiveness effectivness)
+       
+        public void ShouldReturnStringModifiedForUrlUsage(string inputText, OverallEffectiveness expectedEffectiveness)
+        {
+            var actual = new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);
+           Assert.AreEqual(actual, expectedEffectiveness);
+        }
+        
+        [TestCase("")]
+        [TestCase("sdv")]
+        public void ShouldReturnExceptionForOddEffectivenessValues(string inputText)
         {
 
-            var actual = new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);
-           Assert.AreEqual(actual, effectivness);
+            var ex = Assert.Throws<UnmatchedEffectivenessException>(
+                       delegate {new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);});
+
+            Assert.AreEqual($"Invalid Overall Effectiveness: [{inputText}]",ex.Message);
         }
     }
 }

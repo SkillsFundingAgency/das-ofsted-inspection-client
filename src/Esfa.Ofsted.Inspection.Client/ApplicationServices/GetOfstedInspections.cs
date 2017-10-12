@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using Esfa.Ofsted.Inspection.Client.Services;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
-using OfficeOpenXml;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Sfa.Das.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices

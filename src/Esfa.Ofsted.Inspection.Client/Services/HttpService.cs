@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+﻿using System.Net;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {

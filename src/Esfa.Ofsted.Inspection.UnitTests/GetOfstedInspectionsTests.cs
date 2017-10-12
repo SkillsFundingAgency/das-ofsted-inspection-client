@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
-using Esfa.Ofsted.Inspection.Client.Services;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Moq;
 using NUnit.Framework;
 using Sfa.Das.Ofsted.Inspection.Types;
@@ -62,12 +61,12 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
 
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
                 "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The expected was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The expected errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The expected number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The expected line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
+            Assert.IsNull(res.Inspections, $"The actual was not the expected null");
+            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
+            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
+            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
             Assert.IsTrue(res.ErrorSet[0].Message.StartsWith("Could not locate any links in page"), 
-                        $"The returned message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
+                        $"The actual message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
         }
 
         [Test]
@@ -79,8 +78,7 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
 
             var mockAppSettingsService = new Mock<IAppServiceSettings>();
             mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("badurl");
-            //mockAppSettingsService.Setup(x => x.LinkText).Returns("linkText Goes Here");
-
+        
             var getOfstedInspections =
                 new GetOfstedInspections(mockAngleSharpService.Object,
                     mockAppSettingsService.Object,
@@ -90,12 +88,12 @@ namespace Sfa.Das.Ofsted.Inspection.UnitTests
             var res = getOfstedInspections.GetAll();
 
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode, "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The expected was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The expected errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The expected number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The expected line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
+            Assert.IsNull(res.Inspections, $"The actual inspections was not the expected null");
+            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
+            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
+            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
             Assert.IsTrue(res.ErrorSet[0].Message.StartsWith("Could not build a valid url from url"), 
-                                $"The returned message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
+                                $"The actual message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
         }
     }
 }

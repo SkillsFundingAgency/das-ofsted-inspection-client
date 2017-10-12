@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Esfa.Ofsted.Inspection.Client.Services;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Sfa.Das.Ofsted.Inspection.UnitTests
 {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {

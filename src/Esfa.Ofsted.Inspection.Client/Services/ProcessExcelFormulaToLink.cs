@@ -1,5 +1,5 @@
 ﻿using System;
-using Esfa.Ofsted.Inspection.Client.Services.interfaces;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace Esfa.Ofsted.Inspection.Client.Services.interfaces
+﻿namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
     public interface IProcessExcelFormulaToLink
     {

@@ -1,4 +1,4 @@
-﻿namespace Esfa.Ofsted.Inspection.Client.Services
+﻿namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
     public interface IAppServiceSettings
     {

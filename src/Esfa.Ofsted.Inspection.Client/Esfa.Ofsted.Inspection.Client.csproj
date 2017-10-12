@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Esfa..Ofsted.Inspection.Client.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,16 +52,19 @@
   <ItemGroup>
     <Compile Include="ApplicationServices\GetOfstedInspections.cs" />
     <Compile Include="ApplicationServices\IGetOfstedInspections.cs" />
+    <Compile Include="Exceptions\UnmatchedEffectivnessException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AppServiceSettings.cs" />
     <Compile Include="Services\GetInspectionsService.cs" />
+    <Compile Include="Services\GetOfstedDetailsFromExcelPackageService.cs" />
     <Compile Include="Services\HttpService.cs" />
-    <Compile Include="Services\IAppServiceSettings.cs" />
-    <Compile Include="Services\interfaces\IGetInspectionsService.cs" />
-    <Compile Include="Services\interfaces\IAngleSharpService.cs" />
-    <Compile Include="Services\interfaces\IHttpGet.cs" />
-    <Compile Include="Services\interfaces\IOverallEffectivenessProcessor.cs" />
-    <Compile Include="Services\interfaces\IProcessExcelFormulaToLink.cs" />
+    <Compile Include="Services\Interfaces\IAppServiceSettings.cs" />
+    <Compile Include="Services\Interfaces\IGetOfstedDetailsFromExcelPackageService.cs" />
+    <Compile Include="Services\Interfaces\IGetInspectionsService.cs" />
+    <Compile Include="Services\Interfaces\IAngleSharpService.cs" />
+    <Compile Include="Services\Interfaces\IHttpGet.cs" />
+    <Compile Include="Services\Interfaces\IOverallEffectivenessProcessor.cs" />
+    <Compile Include="Services\Interfaces\IProcessExcelFormulaToLink.cs" />
     <Compile Include="Services\AngleSharpService.cs" />
     <Compile Include="Services\OverallEffectivenessProcessor.cs" />
     <Compile Include="Services\ProcessExcelFormulaToLink.cs" />
