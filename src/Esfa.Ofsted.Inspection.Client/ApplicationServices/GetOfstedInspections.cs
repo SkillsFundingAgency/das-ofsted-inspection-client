@@ -17,7 +17,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private readonly IAppServiceSettings _appServiceSettings;
 
         /// <summary>
-        /// 
+        /// default constructor
         /// </summary>
         public GetOfstedInspections() : this(new AngleSharpService(new HttpService()), 
                                             new AppServiceSettings(), 
@@ -35,9 +35,9 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 
 
         /// <summary>
-        /// 
+        /// Returns a list of ofsted inspection details 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A set of inspection details giving website, ukrpn, date ofsted results published, and effectiveness rating</returns>
         public InspectionsDetail GetAll()
         {
             var getFirstMatchingLink = _angleSharpService.GetLinks(_appServiceSettings.InspectionSiteUrl, "a", _appServiceSettings.LinkText).FirstOrDefault();
