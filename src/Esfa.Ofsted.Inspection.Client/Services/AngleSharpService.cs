@@ -5,7 +5,7 @@ using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-    public class AngleSharpService: IAngleSharpService
+    internal class AngleSharpService: IAngleSharpService
     {
         private readonly IHttpGet _httpGet;
 

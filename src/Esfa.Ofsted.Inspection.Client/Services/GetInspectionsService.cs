@@ -5,13 +5,11 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using OfficeOpenXml;
-using Sfa.Das.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-
-   
-    public class GetInspectionsService : IGetInspectionsService
+    internal class GetInspectionsService : IGetInspectionsService
     {
         private readonly IGetOfstedDetailsFromExcelPackageService _getOfstedDetailsFromExcelPackageService;
 
@@ -54,7 +52,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                         }
                   };
             }
-           catch (Exception ex)
+           catch (COMException ex)
             {
                 return new InspectionsDetail
                 {

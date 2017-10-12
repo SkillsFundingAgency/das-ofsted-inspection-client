@@ -2,7 +2,7 @@
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
-namespace Sfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Das.Ofsted.Inspection.UnitTests
 {
     using Moq;
     using NUnit.Framework;

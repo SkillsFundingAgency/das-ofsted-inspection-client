@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Sfa.Das.Ofsted.Inspection.Types
+namespace Esfa.Ofsted.Inspection.Types
 {
     public class InspectionsDetail
     {

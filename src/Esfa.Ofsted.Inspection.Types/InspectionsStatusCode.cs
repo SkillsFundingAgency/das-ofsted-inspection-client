@@ -1,4 +1,4 @@
-﻿namespace Sfa.Das.Ofsted.Inspection.Types
+﻿namespace Esfa.Ofsted.Inspection.Types
 {
     public enum InspectionsStatusCode
     {

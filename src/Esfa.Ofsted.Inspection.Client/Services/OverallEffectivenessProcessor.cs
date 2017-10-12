@@ -1,10 +1,10 @@
 ﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
-using Sfa.Das.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-    public class OverallEffectivenessProcessor: IOverallEffectivenessProcessor
+    internal class OverallEffectivenessProcessor: IOverallEffectivenessProcessor
     {
         public OverallEffectiveness GetOverallEffectiveness(string overallEffectivenessString)
         {

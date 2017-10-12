@@ -1,9 +1,9 @@
 ﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
 using Esfa.Ofsted.Inspection.Client.Services;
+using Esfa.Ofsted.Inspection.Types;
 using NUnit.Framework;
-using Sfa.Das.Ofsted.Inspection.Types;
 
-namespace Sfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Das.Ofsted.Inspection.UnitTests
 {
     [TestFixture]
     public class OverallEffectivenessProcessorTests

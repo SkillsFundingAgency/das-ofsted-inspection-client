@@ -3,7 +3,7 @@ using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-    public class HttpService: IHttpGet
+    internal class HttpService: IHttpGet
     {
         public string Get(string url)
         {

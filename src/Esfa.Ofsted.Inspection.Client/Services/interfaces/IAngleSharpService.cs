@@ -2,7 +2,7 @@
 
 namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
-    public interface IAngleSharpService
+    internal interface IAngleSharpService
     {
         IList<string> GetLinks(string url, string selector, string textInTitle);
     }

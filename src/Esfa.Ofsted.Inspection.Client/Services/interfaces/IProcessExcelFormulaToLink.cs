@@ -1,6 +1,6 @@
 ﻿namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
-    public interface IProcessExcelFormulaToLink
+    internal interface IProcessExcelFormulaToLink
     {
         string GetLinkFromFormula(string hyperlinkFormula);
 

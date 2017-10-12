@@ -2,9 +2,9 @@
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Moq;
 using NUnit.Framework;
-using Sfa.Das.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types;
 
-namespace Sfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Das.Ofsted.Inspection.UnitTests
 {
     [TestFixture]
     public class GetInspectionServiceTests

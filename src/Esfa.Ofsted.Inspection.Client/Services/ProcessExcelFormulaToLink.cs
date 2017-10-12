@@ -3,7 +3,7 @@ using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-    public class ProcessExcelFormulaToLink : IProcessExcelFormulaToLink
+    internal class ProcessExcelFormulaToLink : IProcessExcelFormulaToLink
     {
         public string GetLinkFromFormula(string hyperlinkFormula)
         {

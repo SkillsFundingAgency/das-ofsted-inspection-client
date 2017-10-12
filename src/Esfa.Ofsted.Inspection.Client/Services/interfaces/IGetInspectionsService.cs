@@ -1,8 +1,8 @@
-﻿using Sfa.Das.Ofsted.Inspection.Types;
+﻿using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
-    public interface IGetInspectionsService
+    internal interface IGetInspectionsService
     {
         InspectionsDetail GetInspectionsDetail(string firstLinkUrl);
     }

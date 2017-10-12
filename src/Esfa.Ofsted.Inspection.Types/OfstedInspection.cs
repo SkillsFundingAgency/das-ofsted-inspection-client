@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sfa.Das.Ofsted.Inspection.Types
+namespace Esfa.Ofsted.Inspection.Types
 {
     public class OfstedInspection
     {

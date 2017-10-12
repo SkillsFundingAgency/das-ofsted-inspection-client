@@ -7,8 +7,8 @@
     <ProjectGuid>{F292E632-C8BC-43A9-B5F9-80D803D4ADC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sfa.Das.Ofsted.Inspection.UnitTests</RootNamespace>
-    <AssemblyName>Sfa.Das.Ofsted.Inspection.UnitTests</AssemblyName>
+    <RootNamespace>Esfa.Ofsted.Inspection.UnitTests</RootNamespace>
+    <AssemblyName>Esfa.Ofsted.Inspection.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

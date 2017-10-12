@@ -1,19 +1,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
-using Sfa.Das.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
+    /// <summary>
+    /// Get Latest Ofsted Inspection details available
+    /// </summary>
     public class GetOfstedInspections : IGetOfstedInspections
     {
-        //private readonly ILog _log;
         private readonly IGetInspectionsService _getInspectionsService;
         private readonly IAngleSharpService _angleSharpService;
         private readonly IAppServiceSettings _appServiceSettings;
 
-        public GetOfstedInspections(IAngleSharpService angleSharpService, IAppServiceSettings appServiceSettings,IGetInspectionsService getInspectionsService)
+        /// <summary>
+        /// 
+        /// </summary>
+        public GetOfstedInspections() : this(new AngleSharpService(new HttpService()), 
+                                            new AppServiceSettings(), 
+                                            new GetInspectionsService(new GetOfstedDetailsFromExcelPackageService(
+                                                                    new ProcessExcelFormulaToLink(), 
+                                                                    new OverallEffectivenessProcessor())))
+        {}
+
+        internal GetOfstedInspections(IAngleSharpService angleSharpService, IAppServiceSettings appServiceSettings,IGetInspectionsService getInspectionsService)
         {
             _angleSharpService = angleSharpService;
             _appServiceSettings = appServiceSettings;
@@ -21,6 +34,10 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public InspectionsDetail GetAll()
         {
             var getFirstMatchingLink = _angleSharpService.GetLinks(_appServiceSettings.InspectionSiteUrl, "a", _appServiceSettings.LinkText).FirstOrDefault();

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using OfficeOpenXml;
-using Sfa.Das.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
-    public class GetOfstedDetailsFromExcelPackageService : IGetOfstedDetailsFromExcelPackageService
+    internal class GetOfstedDetailsFromExcelPackageService : IGetOfstedDetailsFromExcelPackageService
     {
         private const int UkprnPosition = 2;
         private const int WebLinkPosition = 1;

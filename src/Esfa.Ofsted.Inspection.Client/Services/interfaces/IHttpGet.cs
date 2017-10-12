@@ -1,6 +1,6 @@
 ﻿namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
-    public interface IHttpGet
+    internal interface IHttpGet
     {
         string Get(string url);
     }
