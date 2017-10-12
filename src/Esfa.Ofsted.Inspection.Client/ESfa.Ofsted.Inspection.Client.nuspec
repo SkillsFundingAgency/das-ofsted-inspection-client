@@ -15,8 +15,9 @@
     <language>en-GB</language>
     <dependencies>
       <group targetFramework=".NETFramework4.5.2">
-        <dependency id="Newtonsoft.Json" version="9.0.1" />
-      <dependency id="Esfa.Ofsted.Inspection.Types" version="$version$" />
+        <dependency id="AngleSharp" version="0.9.9" />
+        <dependency id="EPPlus" version="4.1.1" />
+        <dependency id="Esfa.Ofsted.Inspection.Types" version="$version$" />
       </group>
     </dependencies>
   </metadata>
