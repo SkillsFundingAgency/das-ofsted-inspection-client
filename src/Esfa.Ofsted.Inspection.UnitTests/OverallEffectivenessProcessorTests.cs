@@ -23,6 +23,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         
         [TestCase("")]
         [TestCase("sdv")]
+        [TestCase("22")]
+        [TestCase("--")]
+        [TestCase("01")]
         public void ShouldReturnExceptionForOddEffectivenessValues(string inputText)
         {
 
