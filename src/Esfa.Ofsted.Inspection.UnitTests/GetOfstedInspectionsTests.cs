@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+using Esfa.Ofsted.Inspection.Types;
 using Moq;
 using NUnit.Framework;
-using Esfa.Ofsted.Inspection.Types;
 
-namespace Esfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Ofsted.Inspection.UnitTests
 {
     [TestFixture]
     public class GetOfstedInspectionsTests

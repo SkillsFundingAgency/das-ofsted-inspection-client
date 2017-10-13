@@ -1,7 +1,7 @@
 ﻿using Esfa.Ofsted.Inspection.Client.Services;
 using NUnit.Framework;
 
-namespace Esfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Ofsted.Inspection.UnitTests
 {
     [TestFixture]
     public class ProcessExcelFormulaToLinkTests

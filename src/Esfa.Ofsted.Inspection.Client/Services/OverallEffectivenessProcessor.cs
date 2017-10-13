@@ -6,7 +6,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 {
     internal class OverallEffectivenessProcessor: IOverallEffectivenessProcessor
     {
-        public OverallEffectiveness GetOverallEffectiveness(string overallEffectivenessString)
+        public OverallEffectiveness? GetOverallEffectiveness(string overallEffectivenessString)
         {
             switch (overallEffectivenessString)
             {
@@ -25,7 +25,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 case null:
                     return OverallEffectiveness.NotJudged;
                 default:
-                    throw new UnmatchedEffectivenessException($"Invalid Overall Effectiveness: [{overallEffectivenessString}]");
+                    return null;
             }        
         }
     }

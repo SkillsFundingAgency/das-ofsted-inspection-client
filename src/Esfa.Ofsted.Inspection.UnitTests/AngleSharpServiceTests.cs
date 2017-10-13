@@ -1,13 +1,11 @@
 ﻿using System.Linq;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+using Moq;
+using NUnit.Framework;
 
-namespace Esfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Ofsted.Inspection.UnitTests
 {
-    using Moq;
-    using NUnit.Framework;
-
-
     [TestFixture]
     public class AngleSharpServiceTests
     {

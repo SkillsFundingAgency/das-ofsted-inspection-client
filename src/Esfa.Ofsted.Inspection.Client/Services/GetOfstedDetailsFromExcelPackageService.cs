@@ -41,38 +41,72 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                     ? keyWorksheet.Cells[i, UkprnPosition].Value.ToString()
                     : string.Empty;
                 int ukprn;
-
-                if (string.IsNullOrEmpty(ukprnString) || !int.TryParse(ukprnString, out ukprn))
-                {
-                    errorSet.Add(new InspectionError { LineNumber = i, Message = $"ukprn not a valid int: [{ukprnString}]" });
-                    continue;
-                    
-                }
-
+                var isUkprnValid = int.TryParse(ukprnString, out ukprn);
+                //MFCMFC what happens if there is no formula?
                 var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[i, WebLinkPosition].Formula);
-                
                 var overallEffectivenessString = keyWorksheet.Cells[i, OverallEffectivenessPosition]?.Value?.ToString();
                 var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
+                var datePublishedString = keyWorksheet.Cells[i, DatePublishedPosition]?.Value?.ToString();
                 var datePublished = GetDateTimeValue(keyWorksheet.Cells[i, DatePublishedPosition]);
 
-                if (datePublished != null)
+                if (overallEffectiveness == null)
                 {
-                    var inspectionData = new OfstedInspection
+                    errorSet.Add(new InspectionError
                     {
-                        Ukprn = ukprn,
+                        LineNumber = i,
+                        Message = $"Overall Effectiveness is not a valid value: [{overallEffectivenessString}]",
+                        Ukprn = ukprnString,
                         Website = url,
-                        DatePublished = (DateTime)datePublished,
-                        OverallEffectiveness = overallEffectiveness
-                    };
-
-                    inspections.Add(inspectionData);
-                }
-                else
-                {
-                    errorSet.Add(new InspectionError { LineNumber = i, Message = $"Date Published is invalid: {keyWorksheet.Cells[i, DatePublishedPosition]}" });
+                        DatePublished = datePublishedString,
+                        OverallEffectiveness = overallEffectivenessString
+                    });
                     statusCode = InspectionsStatusCode.ProcessedWithErrors;
+                    continue;
                 }
+
+                // make sure you have a test for an empty/null ukprn value
+                if (! isUkprnValid)
+                {
+                    errorSet.Add(new InspectionError
+                        {
+                        LineNumber = i,
+                        Message = $"ukprn not a valid int: [{ukprnString}]",
+                        Ukprn = ukprnString,
+                        Website = url,
+                        DatePublished = datePublishedString,
+                        OverallEffectiveness = overallEffectivenessString
+                        });
+                    statusCode = InspectionsStatusCode.ProcessedWithErrors;
+                    continue;                 
+                }
+
+                if (datePublished == null)
+                {
+                    errorSet.Add(new InspectionError
+                    {
+                        LineNumber = i,
+                        Message = $"Date Published is invalid: {keyWorksheet.Cells[i, DatePublishedPosition]}",
+                        Ukprn = ukprnString,
+                        Website = url,
+                        DatePublished = datePublishedString,
+                        OverallEffectiveness = overallEffectivenessString
+                    });
+                    statusCode = InspectionsStatusCode.ProcessedWithErrors;
+                    continue;
+                }
+         
+                var inspectionData = new OfstedInspection
+                {
+                    Ukprn = ukprn,
+                    Website = url,
+                    DatePublished = (DateTime)datePublished,
+                    OverallEffectiveness = (OverallEffectiveness)overallEffectiveness
+                };
+
+                inspections.Add(inspectionData);
+                
             }
+
             if (inspections.Count == 0)
             {
                 statusCode = InspectionsStatusCode.NotProcessed;
@@ -84,7 +118,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
         private static DateTime? GetDateTimeValue(ExcelRange excelRange)
         {
-            if (excelRange?.Value == null) throw new ArgumentNullException(nameof(excelRange));
+            if (excelRange?.Value == null) return null;
             var value = excelRange.Value.ToString();
             DateTime dateResult;
             if (DateTime.TryParse(value, out dateResult))

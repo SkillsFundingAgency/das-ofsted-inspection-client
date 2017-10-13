@@ -1,9 +1,8 @@
-﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
-using Esfa.Ofsted.Inspection.Client.Services;
+﻿using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Types;
 using NUnit.Framework;
 
-namespace Esfa.Das.Ofsted.Inspection.UnitTests
+namespace Esfa.Ofsted.Inspection.UnitTests
 {
     [TestFixture]
     public class OverallEffectivenessProcessorTests
@@ -27,10 +26,8 @@ namespace Esfa.Das.Ofsted.Inspection.UnitTests
         public void ShouldReturnExceptionForOddEffectivenessValues(string inputText)
         {
 
-            var ex = Assert.Throws<UnmatchedEffectivenessException>(
-                       delegate {new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);});
-
-            Assert.AreEqual($"Invalid Overall Effectiveness: [{inputText}]",ex.Message);
+            var actual = new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);
+            Assert.IsNull(actual,"An invalid value should be returning null");
         }
     }
 }
