@@ -13,29 +13,35 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private const int WebLinkPosition = 1;
         private const int DatePublishedPosition = 16;
         private const int OverallEffectivenessPosition = 17;
-        private const string WorksheetOfSpreadsheetToUse = "D1 In-year inspection data";
         private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
         private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
+        private readonly IConfigurationSettings _configurationSettings;
 
-        public GetOfstedDetailsFromExcelPackageService(IProcessExcelFormulaToLink processExcelFormulaToLink, IOverallEffectivenessProcessor overallEffectivenessProcessor)
+        public GetOfstedDetailsFromExcelPackageService(IProcessExcelFormulaToLink processExcelFormulaToLink, 
+                                                        IOverallEffectivenessProcessor overallEffectivenessProcessor,
+                                                        IConfigurationSettings configurationSettings)
         {
             _processExcelFormulaToLink = processExcelFormulaToLink;
             _overallEffectivenessProcessor = overallEffectivenessProcessor;
+            _configurationSettings = configurationSettings;
         }
 
-        public InspectionsDetail GetOsftedInspections(ExcelPackage package)
+        public InspectionsDetail ExtractOfstedInspections(ExcelPackage package)
         {
             var inspections = new List<OfstedInspection>();
             var errorSet = new List<InspectionError>();
             var statusCode = InspectionsStatusCode.Success;
+            var worksheetOfSpreadsheetToUse = _configurationSettings.WorksheetName;
 
-            var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == WorksheetOfSpreadsheetToUse);
+            var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == worksheetOfSpreadsheetToUse);
             if (keyWorksheet == null)
             {
                 return ReturnKeyworksheetNotFoundInspectionsDetail();
             }
 
-            for (var lineNumber = keyWorksheet.Dimension.Start.Row + 1; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
+            var lineNumberStart = FindStartingLineNumber(keyWorksheet);
+
+            for (var lineNumber = lineNumberStart; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
             {
                 var error = new InspectionError {LineNumber = lineNumber};
                 
@@ -61,6 +67,18 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             }
 
             return new InspectionsDetail { Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode };
+        }
+
+        private static int FindStartingLineNumber(ExcelWorksheet keyWorksheet)
+        {
+            var lineNumberStart = keyWorksheet.Dimension.Start.Row;
+            var intValue = 0;
+            while (!int.TryParse(keyWorksheet.Cells[lineNumberStart, UkprnPosition]?.Value?.ToString(), out intValue) &&
+                   GetDateTimeValue(keyWorksheet.Cells[lineNumberStart, DatePublishedPosition]) == null)
+            {
+                lineNumberStart++;
+            }
+            return lineNumberStart;
         }
 
         private static void AddInspectionData(int ukprn, string url, DateTime datePublished,
@@ -131,20 +149,13 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return null;
         }
 
-        private static InspectionsDetail ReturnKeyworksheetNotFoundInspectionsDetail()
+        private InspectionsDetail ReturnKeyworksheetNotFoundInspectionsDetail()
         {
             return new InspectionsDetail
             {
-                ErrorSet = new List<InspectionError>
-                {
-                    new InspectionError
-                    {
-                        LineNumber = 0,
-                        Message = $"No worksheet found in the datasource that matches '{WorksheetOfSpreadsheetToUse}'"
-                    }
-                },
                 Inspections = null,
-                StatusCode = InspectionsStatusCode.NotProcessed
+                StatusCode = InspectionsStatusCode.NotProcessed,
+                NotProcessedMessage = $"No worksheet found in the datasource that matches '{_configurationSettings.WorksheetName}'"
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
 using Moq;
@@ -17,7 +18,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string> {"firstMatchingLink" });
 
-            var mockAppSettingsService = new Mock<IAppServiceSettings>();
+            var mockAppSettingsService = new Mock<IConfigurationSettings>();
             mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
             mockAppSettingsService.Setup(x => x.LinkText).Returns("linkText Goes Here");
 
@@ -49,24 +50,24 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string>());
 
-            var mockAppSettingsService = new Mock<IAppServiceSettings>();
+            var mockAppSettingsService = new Mock<IConfigurationSettings>();
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+
             mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
             mockAppSettingsService.Setup(x => x.LinkText).Returns("linkText Goes Here");
             var getOfstedInspections =
                 new GetOfstedInspections(mockAngleSharpService.Object,
                     mockAppSettingsService.Object,
-                    null);
+                    mockGetInspectionsService.Object);
 
             var res = getOfstedInspections.GetAll();
 
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
                 "The status code returned was not 'NotProcessed'");
             Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
-            Assert.IsTrue(res.ErrorSet[0].Message.StartsWith("Could not locate any links in page"), 
-                        $"The actual message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
+            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
+            Assert.IsTrue(res.NotProcessedMessage.StartsWith("Could not locate any links in page"), 
+                        $"The actual message didn't contain the expected words. Message was: [{res.NotProcessedMessage}]");
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string> {"firstMatchingLink"});
 
-            var mockAppSettingsService = new Mock<IAppServiceSettings>();
+            var mockAppSettingsService = new Mock<IConfigurationSettings>();
             mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("badurl");
         
             var getOfstedInspections =
@@ -89,11 +90,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode, "The status code returned was not 'NotProcessed'");
             Assert.IsNull(res.Inspections, $"The actual inspections was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
-            Assert.IsTrue(res.ErrorSet[0].Message.StartsWith("Could not build a valid url from url"), 
-                                $"The actual message didn't contain the expected words. Message was: [{res.ErrorSet[0].Message}]");
+            Assert.IsNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
+            Assert.IsTrue(res.NotProcessedMessage.StartsWith("Could not build a valid url from url"), 
+                                $"The actual message didn't contain the expected words. Message was: [{res.NotProcessedMessage}]");
         }
     }
 }

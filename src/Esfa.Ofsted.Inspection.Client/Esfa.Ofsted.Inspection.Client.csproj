@@ -55,11 +55,16 @@
     <Compile Include="ApplicationServices\IGetOfstedInspections.cs" />
     <Compile Include="Exceptions\UnmatchedEffectivnessException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\AppServiceSettings.cs" />
+    <Compile Include="ConfigurationResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigurationResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\ConfigurationSettings.cs" />
     <Compile Include="Services\GetInspectionsService.cs" />
     <Compile Include="Services\GetOfstedDetailsFromExcelPackageService.cs" />
     <Compile Include="Services\HttpService.cs" />
-    <Compile Include="Services\Interfaces\IAppServiceSettings.cs" />
+    <Compile Include="Services\Interfaces\IConfigurationSettings.cs" />
     <Compile Include="Services\Interfaces\IGetOfstedDetailsFromExcelPackageService.cs" />
     <Compile Include="Services\Interfaces\IGetInspectionsService.cs" />
     <Compile Include="Services\Interfaces\IAngleSharpService.cs" />
@@ -79,6 +84,12 @@
   <ItemGroup>
     <None Include="ESfa.Ofsted.Inspection.Client.nuspec" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ConfigurationResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConfigurationResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

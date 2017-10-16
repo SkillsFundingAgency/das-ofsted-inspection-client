@@ -14,22 +14,23 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
     {
         private readonly IGetInspectionsService _getInspectionsService;
         private readonly IAngleSharpService _angleSharpService;
-        private readonly IAppServiceSettings _appServiceSettings;
+        private readonly IConfigurationSettings _configurationSettings;
 
         /// <summary>
         /// default constructor
         /// </summary>
         public GetOfstedInspections() : this(new AngleSharpService(new HttpService()), 
-                                            new AppServiceSettings(), 
+                                            new ConfigurationSettings(), 
                                             new GetInspectionsService(new GetOfstedDetailsFromExcelPackageService(
-                                                                    new ProcessExcelFormulaToLink(), 
-                                                                    new OverallEffectivenessProcessor())))
+                                                                                new ProcessExcelFormulaToLink(), 
+                                                                                new OverallEffectivenessProcessor(), 
+                                                                                new ConfigurationSettings())))
         {}
 
-        internal GetOfstedInspections(IAngleSharpService angleSharpService, IAppServiceSettings appServiceSettings,IGetInspectionsService getInspectionsService)
+        internal GetOfstedInspections(IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
         {
             _angleSharpService = angleSharpService;
-            _appServiceSettings = appServiceSettings;
+            _configurationSettings = configurationSettings;
             _getInspectionsService = getInspectionsService;
         }
 
@@ -40,17 +41,17 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// <returns>A set of inspection details giving website, ukrpn, date ofsted results published, and effectiveness rating</returns>
         public InspectionsDetail GetAll()
         {
-            var getFirstMatchingLink = _angleSharpService.GetLinks(_appServiceSettings.InspectionSiteUrl, "a", _appServiceSettings.LinkText).FirstOrDefault();
+            var getFirstMatchingLink = _angleSharpService.GetLinks(_configurationSettings.InspectionSiteUrl, "a", _configurationSettings.LinkText).FirstOrDefault();
             if (getFirstMatchingLink==null)
                 {
-                return RaiseNotProcessedInspectionError($"Could not locate any links in page [{_appServiceSettings.InspectionSiteUrl}] with text [{_appServiceSettings.LinkText}]");
+                return RaiseNotProcessedInspectionError($"Could not locate any links in page [{_configurationSettings.InspectionSiteUrl}] with text [{_configurationSettings.LinkText}]");
                 }
 
             var firstLinkUrl = BuildFirstLinkUrl(getFirstMatchingLink);
 
             if (firstLinkUrl == string.Empty)
                 {
-                return RaiseNotProcessedInspectionError($"Could not build a valid url from url [{_appServiceSettings.InspectionSiteUrl}], link [{getFirstMatchingLink}]");
+                return RaiseNotProcessedInspectionError($"Could not build a valid url from url [{_configurationSettings.InspectionSiteUrl}], link [{getFirstMatchingLink}]");
                 }
 
             return _getInspectionsService.GetInspectionsDetail(firstLinkUrl);
@@ -59,7 +60,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private string BuildFirstLinkUrl(string getFirstMatchingLink)
         {
             Uri uriResult;
-            if (!Uri.TryCreate(_appServiceSettings.InspectionSiteUrl, UriKind.Absolute, out uriResult))
+            if (!Uri.TryCreate(_configurationSettings.InspectionSiteUrl, UriKind.Absolute, out uriResult))
                 return string.Empty;
 
             var firstLinkUrl = $"{uriResult.Scheme}://{uriResult.Host}{getFirstMatchingLink}";
@@ -71,14 +72,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             return new InspectionsDetail
             {
                 StatusCode = InspectionsStatusCode.NotProcessed,
-                ErrorSet = new List<InspectionError>
-                {
-                    new InspectionError
-                    {
-                        LineNumber = 0,
-                        Message = message
-                    }
-                }
+                NotProcessedMessage = message
             };
         }
     }

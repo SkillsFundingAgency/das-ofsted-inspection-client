@@ -21,13 +21,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
                 "The status code returned was not 'NotProcessed'");
             Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
-            Assert.IsTrue(res.ErrorSet[0].Message.StartsWith($"Error whilst trying to read url: [{invalidUrl}], message: ["), "Message returned from error is not as expected");
+            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
+            Assert.IsTrue(res.NotProcessedMessage.StartsWith($"Error whilst trying to read url: [{invalidUrl}], message: ["), "Message returned from error is not as expected");
         }
-
-
 
         [Test]
         public void TestALinkThatIsNotExcel()
@@ -40,10 +36,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
                 "The status code returned was not 'NotProcessed'");
             Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNotNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
-            Assert.AreEqual(1, res.ErrorSet.Count, $"The actual number of errors was {res.ErrorSet.Count}, instead of the expected 1");
-            Assert.AreEqual(0, res.ErrorSet[0].LineNumber, $"The actual line number from the error was {res.ErrorSet[0].LineNumber}, instead of the expected 0");
-            Assert.IsTrue(res.ErrorSet[0].Message.StartsWith($"Error whilst trying to read excel details from url: [{urlWithoutExcel}], message: ["), "Message returned from error is not as expected");
+            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
+            Assert.IsTrue(res.NotProcessedMessage.StartsWith($"Error whilst trying to read excel details from url: [{urlWithoutExcel}], message: ["), "Message returned from error is not as expected");
         }
     }
 }

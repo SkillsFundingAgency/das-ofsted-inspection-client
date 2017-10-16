@@ -31,7 +31,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                     {
                         using (var package = new ExcelPackage(stream))
                         {
-                            inspectionsDetail = _getOfstedDetailsFromExcelPackageService.GetOsftedInspections(package);
+                            inspectionsDetail = _getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(package);
                         }
                     }
                 }
@@ -42,14 +42,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 {
                     Inspections = null,
                     StatusCode = InspectionsStatusCode.NotProcessed,
-                    ErrorSet = new List<InspectionError>
-                        {
-                            new InspectionError
-                            {
-                                LineNumber = 0,
-                                Message = $"Error whilst trying to read url: [{firstLinkUrl}], message: [{ex.Message}]"
-                            }
-                        }
+                    NotProcessedMessage = $"Error whilst trying to read url: [{firstLinkUrl}], message: [{ex.Message}]"
                   };
             }
            catch (COMException ex)
@@ -58,14 +51,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 {
                     Inspections = null,
                     StatusCode = InspectionsStatusCode.NotProcessed,
-                    ErrorSet = new List<InspectionError>
-                    {
-                        new InspectionError
-                        {
-                            LineNumber = 0,
-                            Message = $"Error whilst trying to read excel details from url: [{firstLinkUrl}], message: [{ex.Message}]"
-                        }
-                    }
+                    NotProcessedMessage = $"Error whilst trying to read excel details from url: [{firstLinkUrl}], message: [{ex.Message}]"           
                 };
             }
 

@@ -20,5 +20,10 @@ namespace Esfa.Ofsted.Inspection.Types
         /// </summary>
         public InspectionsStatusCode StatusCode { get; set; }
 
+        /// <summary>
+        /// Message about error when no inspection details are returned
+        /// </summary>
+        public string NotProcessedMessage { get; set; }
+
     }
 }

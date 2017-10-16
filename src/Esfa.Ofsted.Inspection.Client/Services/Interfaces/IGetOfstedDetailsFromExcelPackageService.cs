@@ -5,6 +5,6 @@ namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
     internal interface IGetOfstedDetailsFromExcelPackageService
     {
-        InspectionsDetail GetOsftedInspections(ExcelPackage package);
+        InspectionsDetail ExtractOfstedInspections(ExcelPackage package);
     }
 }
