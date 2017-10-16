@@ -25,10 +25,11 @@
         /// Line in originating document where error occurred
         /// </summary>
         public int LineNumber { get; set; }
+
         /// <summary>
         /// Message about error
         /// </summary>
-        public string Message { get; set; }
+        public string Message => "One or more items do not have a valid value";
 
 
     }

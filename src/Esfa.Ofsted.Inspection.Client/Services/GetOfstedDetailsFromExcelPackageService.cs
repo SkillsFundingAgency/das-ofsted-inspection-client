@@ -120,10 +120,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         {
             var datePublishedString = keyWorksheet.Cells[lineNumber, DatePublishedPosition]?.Value?.ToString();
             var datePublished = GetDateTimeValue(keyWorksheet.Cells[lineNumber, DatePublishedPosition]);
-            if (datePublished == null)
-            {
-                error.Message += $"Date published is invalid: [{datePublishedString}]; ";
-            }
+            error.DatePublished = datePublishedString;
             return datePublished;
         }
 
@@ -131,12 +128,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         {
             var overallEffectivenessString = keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value?.ToString();
             var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
-
-            if (overallEffectiveness == null)
-            {
-                error.Message += $"Overall Effectiveness is not a valid value: [{overallEffectivenessString}]; ";
-                error.OverallEffectiveness = overallEffectivenessString;
-            }
+            error.OverallEffectiveness = overallEffectivenessString;
             return overallEffectiveness;
         }
 
@@ -145,13 +137,11 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var ukprnString = keyWorksheet.Cells[lineNumber, UkprnPosition].Value != null
                 ? keyWorksheet.Cells[lineNumber, UkprnPosition].Value.ToString()
                 : string.Empty;
-            int ukprn;
-            var isUkprnValid = int.TryParse(ukprnString, out ukprn);
             error.Ukprn = ukprnString;
-            if (!isUkprnValid)
-            {
-                error.Message += $"ukprn not a valid int: [{ukprnString}]; ";
-            }
+            int ukprn;
+            if (!int.TryParse(ukprnString, out ukprn))
+                return null;
+
             return ukprn;
         }
 
