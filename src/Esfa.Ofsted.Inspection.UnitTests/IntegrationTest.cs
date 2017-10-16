@@ -6,13 +6,13 @@ namespace Esfa.Ofsted.Inspection.UnitTests
     [TestFixture]
     public class IntegrationTest
     {
-
-        [Test]
-        public void ShouldReturnDetailsWithoutError()
-        {
-            var inspectionDetails = new GetOfstedInspections().GetAll();
-            Assert.IsTrue(true);
-
-        }
+//
+//        [Test]
+//        public void ShouldReturnDetailsWithoutError()
+//        {
+//            var inspectionDetails = new GetOfstedInspections().GetAll();
+//            Assert.IsTrue(true);
+//
+//        }
     }
 }

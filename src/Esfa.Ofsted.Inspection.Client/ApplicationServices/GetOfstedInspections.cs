@@ -42,6 +42,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         public InspectionsDetail GetAll()
         {
             var getFirstMatchingLink = _angleSharpService.GetLinks(_configurationSettings.InspectionSiteUrl, "a", _configurationSettings.LinkText).FirstOrDefault();
+
             if (getFirstMatchingLink==null)
                 {
                 return RaiseNotProcessedInspectionError($"Could not locate any links in page [{_configurationSettings.InspectionSiteUrl}] with text [{_configurationSettings.LinkText}]");

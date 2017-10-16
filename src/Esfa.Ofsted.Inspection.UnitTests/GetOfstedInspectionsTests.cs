@@ -18,19 +18,21 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string> {"firstMatchingLink" });
 
-            var mockAppSettingsService = new Mock<IConfigurationSettings>();
-            mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
-            mockAppSettingsService.Setup(x => x.LinkText).Returns("linkText Goes Here");
+            var mockConfigurationSettings = new Mock<IConfigurationSettings>();
+            mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
+            mockConfigurationSettings.Setup(x => x.LinkText).Returns("linkText Goes Here");
 
             var mockGetInspectionsService = new Mock<IGetInspectionsService>();
 
-            var inspectionDetail = new InspectionsDetail { StatusCode = InspectionsStatusCode.Success, Inspections = new List<OfstedInspection> {new OfstedInspection()}, ErrorSet = null};
+            var inspectionDetail = new InspectionsDetail { StatusCode = InspectionsStatusCode.Success,
+                                                           Inspections = new List<OfstedInspection> {new OfstedInspection()},
+                                                           ErrorSet = null};
 
             mockGetInspectionsService.Setup(x => x.GetInspectionsDetail(It.IsAny<string>())).Returns(inspectionDetail);
 
             var getOfstedInspections =
                 new GetOfstedInspections(mockAngleSharpService.Object,
-                    mockAppSettingsService.Object,
+                    mockConfigurationSettings.Object,
                     mockGetInspectionsService.Object);
 
             var res = getOfstedInspections.GetAll();
@@ -50,14 +52,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string>());
 
-            var mockAppSettingsService = new Mock<IConfigurationSettings>();
+            var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             var mockGetInspectionsService = new Mock<GetInspectionsService>(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
 
-            mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
-            mockAppSettingsService.Setup(x => x.LinkText).Returns("linkText Goes Here");
+            mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
+            mockConfigurationSettings.Setup(x => x.LinkText).Returns("linkText Goes Here");
             var getOfstedInspections =
                 new GetOfstedInspections(mockAngleSharpService.Object,
-                    mockAppSettingsService.Object,
+                    mockConfigurationSettings.Object,
                     mockGetInspectionsService.Object);
 
             var res = getOfstedInspections.GetAll();
@@ -77,20 +79,21 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockAngleSharpService.Setup(x => x.GetLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<string> {"firstMatchingLink"});
 
-            var mockAppSettingsService = new Mock<IConfigurationSettings>();
-            mockAppSettingsService.Setup(x => x.InspectionSiteUrl).Returns("badurl");
-        
+            var mockConfigurationSettings = new Mock<IConfigurationSettings>();
+            mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("badurl");
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+
             var getOfstedInspections =
                 new GetOfstedInspections(mockAngleSharpService.Object,
-                    mockAppSettingsService.Object,
-                    null
+                    mockConfigurationSettings.Object,
+                    mockGetInspectionsService.Object
                 );
 
             var res = getOfstedInspections.GetAll();
 
             Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode, "The status code returned was not 'NotProcessed'");
             Assert.IsNull(res.Inspections, $"The actual inspections was not the expected null");
-            Assert.IsNull(res.ErrorSet, $"The actual errorset was null, instead of not null");
+            Assert.IsNull(res.ErrorSet, $"The actual errorset was not the expected null");
             Assert.IsTrue(res.NotProcessedMessage.StartsWith("Could not build a valid url from url"), 
                                 $"The actual message didn't contain the expected words. Message was: [{res.NotProcessedMessage}]");
         }
