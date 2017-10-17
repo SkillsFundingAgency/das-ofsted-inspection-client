@@ -150,14 +150,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
                 Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
-                Assert.AreEqual("29-Sep-17 12:00:00 AM", inspectionDetails.ErrorSet[0].DatePublished);
+                Assert.AreEqual(new DateTime(2017, 09, 29), Convert.ToDateTime(inspectionDetails.ErrorSet[0].DatePublished));
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
                 Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
                 Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
                 Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
                 Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
                 Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
-                Assert.AreEqual("28-Sep-17 12:00:00 AM", inspectionDetails.ErrorSet[2].DatePublished);
+                Assert.AreEqual(new DateTime(2017, 09, 28), Convert.ToDateTime(inspectionDetails.ErrorSet[2].DatePublished));
                 Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
                 Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
