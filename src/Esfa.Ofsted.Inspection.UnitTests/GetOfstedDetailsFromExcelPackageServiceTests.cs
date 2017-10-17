@@ -13,48 +13,48 @@ namespace Esfa.Ofsted.Inspection.UnitTests
     {
         const string FocusWorksheet = "worksheet with details";
 
-        //[Test]
-        //public void ShouldErrorAsInvalidExcelPackagePassedIn()
-        //{
-        //    var excelPackage = CreateBasicExcelSpreadsheetForTesting();
-        //    var getOfstedDetailsFromExcelPackageService
-        //        = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
-        //            Mock.Of<OverallEffectivenessProcessor>(), Mock.Of<IConfigurationSettings>());
+        [Test]
+        public void ShouldErrorAsInvalidExcelPackagePassedIn()
+        {
+            var excelPackage = CreateBasicExcelSpreadsheetForTesting();
+            var getOfstedDetailsFromExcelPackageService
+                = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
+                    Mock.Of<OverallEffectivenessProcessor>(), Mock.Of<IConfigurationSettings>());
 
-        //    var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
-        //    Assert.AreEqual(0, inspectionDetails.Inspections.Count);
-        //    Assert.AreEqual(InspectionsStatusCode.NotProcessed, inspectionDetails.StatusCode);
-        //    Assert.AreEqual(0, inspectionDetails.ErrorSet.Count);
-        //    Assert.IsTrue(inspectionDetails.NotProcessedMessage.StartsWith("No worksheet found in the datasource that matches"));      
-        //}
+            var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
+            Assert.AreEqual(0, inspectionDetails.Inspections.Count);
+            Assert.AreEqual(InspectionsStatusCode.NotProcessed, inspectionDetails.StatusCode);
+            Assert.AreEqual(0, inspectionDetails.ErrorSet.Count);
+            Assert.IsTrue(inspectionDetails.NotProcessedMessage.StartsWith("No worksheet found in the datasource that matches"));
+        }
 
-        //[Test]
-        //public void ShouldErrorAsInvalidIfLineNumberStartNotFound()
-        //{
-        //    var excelPackage = CreateBasicExcelSpreadsheetForTesting();
+        [Test]
+        public void ShouldErrorAsInvalidIfLineNumberStartNotFound()
+        {
+            var excelPackage = CreateBasicExcelSpreadsheetForTesting();
 
-        //    var hyperlink =
-        //        "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
+            var hyperlink =
+                "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
 
-        //    const string focusWorksheet = "worksheet with details";
-        //    var mockConfigurationSettings = new Mock<IConfigurationSettings>();
-        //    mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(focusWorksheet);
+            const string focusWorksheet = "worksheet with details";
+            var mockConfigurationSettings = new Mock<IConfigurationSettings>();
+            mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(focusWorksheet);
 
-        //    var getOfstedDetailsFromExcelPackageService
-        //        = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
-        //            Mock.Of<IOverallEffectivenessProcessor>(), mockConfigurationSettings.Object);
+            var getOfstedDetailsFromExcelPackageService
+                = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
+                    Mock.Of<IOverallEffectivenessProcessor>(), mockConfigurationSettings.Object);
 
-        //    var excelWorksheet = excelPackage.Workbook.Worksheets[2];
-        //    CreateRow(excelWorksheet, 5, hyperlink, string.Empty,string.Empty,"abc");
-        //    CreateRow(excelWorksheet, 6, "random", string.Empty, string.Empty, "zed");
+            var excelWorksheet = excelPackage.Workbook.Worksheets[2];
+            CreateRow(excelWorksheet, 5, hyperlink, string.Empty, string.Empty, "abc");
+            CreateRow(excelWorksheet, 6, "random", string.Empty, string.Empty, "zed");
 
-        //    var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
+            var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
-        //    Assert.AreEqual(0,inspectionDetails.Inspections.Count);
-        //    Assert.AreEqual(InspectionsStatusCode.NotProcessed, inspectionDetails.StatusCode);
-        //    Assert.AreEqual(0,inspectionDetails.ErrorSet.Count);
-        //    Assert.IsTrue(inspectionDetails.NotProcessedMessage.Equals("No details could be found when processing"));
-        //}
+            Assert.AreEqual(0, inspectionDetails.Inspections.Count);
+            Assert.AreEqual(InspectionsStatusCode.NotProcessed, inspectionDetails.StatusCode);
+            Assert.AreEqual(0, inspectionDetails.ErrorSet.Count);
+            Assert.IsTrue(inspectionDetails.NotProcessedMessage.Equals("No details could be found when processing"));
+        }
 
 
         //[Test]
