@@ -111,7 +111,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             excelWorksheet.Cells[4, 3].Value = "Provider UKPRN";
             excelWorksheet.Cells[4, 16].Value = "Date published";
             excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
-            excelWorksheet = excelPackage.Workbook.Worksheets[2];
+            excelWorksheet = excelPackage.Workbook.Worksheets[focusWorksheet];
 
             //CreateRow(excelWorksheet, 5, hyperlink, "10033440", "31-08-2017", "9");
 
@@ -122,7 +122,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
 
             CreateRow(excelWorksheet, 6, "random", "10033441", "30-09-2017", "9");
-            CreateRow(excelWorksheet,7, "random", "", "29-09-2017", "4");
+            CreateRow(excelWorksheet, 7, "random", "", "29-09-2017", "4");
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
             CreateRow(excelWorksheet, 9, "random", "10033443", "28-09-2017", "x");
             CreateRow(excelWorksheet, 10, "random", "", "date stuff", "notvalid");
@@ -154,8 +154,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
 
-            //Assert.Multiple(() =>
-            //{
+            Assert.Multiple(() =>
+            {
                 Assert.AreEqual(2, inspectionDetails.Inspections.Count,
                     $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
@@ -174,7 +174,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
                 Assert.AreEqual("notvalid", inspectionDetails.ErrorSet[3].OverallEffectiveness);
                 Assert.IsNull(inspectionDetails.NotProcessedMessage, "The NotProcessedMessage was expected to be null");
-            //});
+            });
         }
 
         //[Test]
