@@ -135,42 +135,42 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>())).Returns((string)null);
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(hyperlink)).Returns(hyperlinkResult);
 
-            var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
-            mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
-                .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
+            //var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
+            //mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
+            //    .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
 
-            mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("4"))
-                .Returns(OverallEffectiveness.Inadequate);
+            //mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("4"))
+            //    .Returns(OverallEffectiveness.Inadequate);
+
+            //var getOfstedDetailsFromExcelPackageService
+            //    = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
+            //        mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             var getOfstedDetailsFromExcelPackageService
                 = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
-                    mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
+                    new OverallEffectivenessProcessor(), mockConfigurationSettings.Object);
+
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
-            Assert.Multiple(() =>
-                {
-                    Assert.AreEqual(2, inspectionDetails.Inspections.Count, $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
-                    Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
-                        "InspectionDetails status code was expected to be Processed with errors");
-                    Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
-                    Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
-                    Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished);
-                    Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
-                    Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
-                    Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
-                    Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
-                    Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
-                    Assert.AreEqual("28-09-2017", inspectionDetails.ErrorSet[2].DatePublished);
-                    Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
-                    Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
-                    Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
-                    Assert.AreEqual("notvalid", inspectionDetails.ErrorSet[3].OverallEffectiveness);
-                    Assert.IsNull(inspectionDetails.NotProcessedMessage, "The NotProcessedMessage was expected to be null");
-                }
-            );
-
-
+ 
+            Assert.AreEqual(2, inspectionDetails.Inspections.Count, $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
+            Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
+                "InspectionDetails status code was expected to be Processed with errors");
+            Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
+            Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
+            Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished);
+            Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
+            Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
+            Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
+            Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
+            Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
+            Assert.AreEqual("28-09-2017", inspectionDetails.ErrorSet[2].DatePublished);
+            Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
+            Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
+            Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
+            Assert.AreEqual("notvalid", inspectionDetails.ErrorSet[3].OverallEffectiveness);
+            Assert.IsNull(inspectionDetails.NotProcessedMessage, "The NotProcessedMessage was expected to be null");
         }
 
         //[Test]
