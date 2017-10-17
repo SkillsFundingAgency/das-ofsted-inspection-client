@@ -113,7 +113,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
             excelWorksheet = excelPackage.Workbook.Worksheets[2];
 
-            CreateRow(excelWorksheet, 5, hyperlink, "10033440", "31-08-2017", "9");
+            //CreateRow(excelWorksheet, 5, hyperlink, "10033440", "31-08-2017", "9");
+
+            excelWorksheet.Cells[5, 1].Formula = hyperlink;
+            excelWorksheet.Cells[5, 3].Value = "10033440";
+            excelWorksheet.Cells[5, 16].Value = "31-08-2017";
+            excelWorksheet.Cells[5, 17].Value = "9";
+
+
             CreateRow(excelWorksheet, 6, "random", "10033441", "30-09-2017", "9");
             CreateRow(excelWorksheet,7, "random", "", "29-09-2017", "4");
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
@@ -143,9 +150,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             Assert.Multiple(() =>
                 {
-                    //Assert.AreEqual(2, inspectionDetails.Inspections.Count, $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
+                    Assert.AreEqual(2, inspectionDetails.Inspections.Count, $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
                     Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
-                        "InspectionDetails status code was expected to be Success");
+                        "InspectionDetails status code was expected to be Processed with errors");
                     Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
                     Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
                     Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished);
