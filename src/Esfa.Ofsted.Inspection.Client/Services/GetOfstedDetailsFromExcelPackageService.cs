@@ -153,15 +153,8 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
         private static DateTime? GetDateTimeValue(ExcelRange excelRange)
         {
-            if (excelRange?.Value == null) return null;
-            var value = excelRange.Value.ToString();
-            DateTime dateResult;
-            if (DateTime.TryParse(value, out dateResult))
-            {
-                return dateResult;
-            }
-
-            return null;
+            var value = excelRange?.Value;
+            return value as DateTime?;
         }
     }
 }

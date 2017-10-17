@@ -1,4 +1,5 @@
-﻿using Esfa.Ofsted.Inspection.Client.Services;
+﻿using System;
+using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
 using Moq;
@@ -113,18 +114,11 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
             excelWorksheet = excelPackage.Workbook.Worksheets[focusWorksheet];
 
-            //CreateRow(excelWorksheet, 5, hyperlink, "10033440", "31-08-2017", "9");
-
-            excelWorksheet.Cells[5, 1].Formula = hyperlink;
-            excelWorksheet.Cells[5, 3].Value = "10033440";
-            excelWorksheet.Cells[5, 16].Value = "31-08-2017";
-            excelWorksheet.Cells[5, 17].Value = "9";
-
-
-            CreateRow(excelWorksheet, 6, "random", "10033441", "30-09-2017", "9");
-            CreateRow(excelWorksheet, 7, "random", "", "29-09-2017", "4");
+            CreateRow(excelWorksheet, 5, hyperlink, "10033440", new DateTime(2017,08,31), "9");
+            CreateRow(excelWorksheet, 6, "random", "10033441", new DateTime(2017, 09, 30), "9");
+            CreateRow(excelWorksheet, 7, "random", "", new DateTime(2017, 09, 29), "4");
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
-            CreateRow(excelWorksheet, 9, "random", "10033443", "28-09-2017", "x");
+            CreateRow(excelWorksheet, 9, "random", "10033443", new DateTime(2017, 09, 28), "x");
             CreateRow(excelWorksheet, 10, "random", "", "date stuff", "notvalid");
 
 
@@ -156,14 +150,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
                 Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
-                Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished, $"Error returned with message {inspectionDetails.ErrorSet[0].Message}");
+                Assert.AreEqual("29-Sep-17 12:00:00 AM", inspectionDetails.ErrorSet[0].DatePublished);
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
                 Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
                 Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
                 Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
                 Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
                 Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
-                Assert.AreEqual("28-09-2017", inspectionDetails.ErrorSet[2].DatePublished);
+                Assert.AreEqual("28-Sep-17 12:00:00 AM", inspectionDetails.ErrorSet[2].DatePublished);
                 Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
                 Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
@@ -247,7 +241,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             return excelPackage;
         }
 
-        private static void CreateRow(ExcelWorksheet excelWorksheet, int rowNumber, string url, string ukprn, string datePublished, string overallEffectiveness)
+        private static void CreateRow(ExcelWorksheet excelWorksheet, int rowNumber, string url, string ukprn, object datePublished, string overallEffectiveness)
         {
             excelWorksheet.Cells[rowNumber, 1].Formula = url;
             excelWorksheet.Cells[rowNumber, 3].Value = ukprn;
