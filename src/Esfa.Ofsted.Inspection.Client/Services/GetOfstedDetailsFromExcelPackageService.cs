@@ -121,6 +121,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var datePublishedString = keyWorksheet.Cells[lineNumber, DatePublishedPosition]?.Value?.ToString();
             var datePublished = GetDateTimeValue(keyWorksheet.Cells[lineNumber, DatePublishedPosition]);
             error.DatePublished = datePublishedString;
+            error.Message = $"'{datePublishedString}' could not be converted to date";
             return datePublished;
         }
 
@@ -129,6 +130,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var overallEffectivenessString = keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value?.ToString();
             var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
             error.OverallEffectiveness = overallEffectivenessString;
+            error.Message = $"'{overallEffectivenessString}' could not be converted to overallEffectiveness";
             return overallEffectiveness;
         }
 
@@ -140,9 +142,12 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             error.Ukprn = ukprnString;
             int ukprn;
             if (!int.TryParse(ukprnString, out ukprn))
+            {
+                error.Message = $"'{ukprnString}' could not be converted to overallEffectiveness";
                 return null;
-
-            return ukprn;
+            }
+        
+        return ukprn;
         }
 
 

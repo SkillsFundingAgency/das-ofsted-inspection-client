@@ -135,21 +135,16 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>())).Returns((string)null);
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(hyperlink)).Returns(hyperlinkResult);
 
-            //var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
-            //mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
-            //    .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
+            var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
+            mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
+                .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
 
-            //mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("4"))
-            //    .Returns(OverallEffectiveness.Inadequate);
-
-            //var getOfstedDetailsFromExcelPackageService
-            //    = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
-            //        mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
+            mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("4"))
+                .Returns(OverallEffectiveness.Inadequate);
 
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(new ProcessExcelFormulaToLink(), 
-                    new OverallEffectivenessProcessor(), mockConfigurationSettings.Object);
-
+                = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
+                    mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
@@ -161,8 +156,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
                 Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
+                Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished, $"Error returned with message {inspectionDetails.ErrorSet[0].Message}");
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
-                Assert.AreEqual("29-09-2017", inspectionDetails.ErrorSet[0].DatePublished);
                 Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
                 Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
                 Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);

@@ -29,7 +29,8 @@
         /// <summary>
         /// Message about error
         /// </summary>
-        public string Message => "One or more items do not have a valid value";
+       // public string Message => "One or more items do not have a valid value";
+       public string Message { get; set; }
 
 
     }
