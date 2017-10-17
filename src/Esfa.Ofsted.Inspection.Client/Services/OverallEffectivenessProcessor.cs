@@ -1,5 +1,4 @@
-﻿using Esfa.Ofsted.Inspection.Client.Exceptions;
-using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+﻿using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
 
 namespace Esfa.Ofsted.Inspection.Client.Services

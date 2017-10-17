@@ -4,10 +4,14 @@ using Esfa.Ofsted.Inspection.Types;
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
     /// <summary>
-    /// Get All available Ofsted Inspection Details
+    /// Get Ofsted Inspection Details
     /// </summary>
     public interface IGetOfstedInspections
     {
+        /// <summary>
+        /// Get All Inspections
+        /// </summary>
+        /// <returns></returns>
         InspectionsDetail GetAll();
     }
 }
