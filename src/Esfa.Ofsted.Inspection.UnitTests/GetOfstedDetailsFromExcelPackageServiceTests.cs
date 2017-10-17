@@ -99,9 +99,6 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
             var hyperlinkResult = @"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805";
 
-            //const string focusWorksheet = "worksheet with details";
-
-            //var excelPackage = CreateBasicExcelSpreadsheetForTesting();
 
             var excelPackage = new ExcelPackage();
 
@@ -114,7 +111,6 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             excelWorksheet.Cells[4, 3].Value = "Provider UKPRN";
             excelWorksheet.Cells[4, 16].Value = "Date published";
             excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
-
             excelWorksheet = excelPackage.Workbook.Worksheets[2];
 
             CreateRow(excelWorksheet, 5, hyperlink, "10033440", "31-08-2017", "9");
@@ -178,10 +174,18 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
             var hyperlinkResult = @"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805";
 
-            const string focusWorksheet = "worksheet with details";
+            var excelPackage = new ExcelPackage();
 
-            var excelPackage = CreateBasicExcelSpreadsheetForTesting();
-            var excelWorksheet = excelPackage.Workbook.Worksheets[2];
+            const string focusWorksheet = "worksheet with details";
+            excelPackage.Workbook.Worksheets.Add("worksheet 1");
+            var excelWorksheet = excelPackage.Workbook.Worksheets.Add(focusWorksheet);
+            excelWorksheet.Cells[1, 1].Value =
+                "In-year full and short inspection outcomes for further education and skills providers";
+            excelWorksheet.Cells[4, 1].Value = "Web link";
+            excelWorksheet.Cells[4, 3].Value = "Provider UKPRN";
+            excelWorksheet.Cells[4, 16].Value = "Date published";
+            excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
+            excelWorksheet = excelPackage.Workbook.Worksheets[2];
 
             CreateRow(excelWorksheet, 7, "random", "", "29-09-2017", "4");
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
