@@ -1,6 +1,9 @@
-﻿using Esfa.Ofsted.Inspection.Client.Services;
+﻿using System;
+using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types.Exceptions;
 using Moq;
 using NUnit.Framework;
 
@@ -13,31 +16,56 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [Test]
         public void TestAnInvalidUrl()
         {
-            var getInspectionService = new GetInspectionsService(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockLogger = new Mock<ILogFunctions>();
+            var errorMessageString = string.Empty;
+            Exception errorException = null;
+            var errorAction = new Action<string, Exception>((message, exception) =>
+            {
+                errorMessageString = message;
+                errorException = exception;
+            });
+            mockLogger.SetupGet(x => x.Error).Returns(errorAction);
+
+            var action = new Action<string>(message => { });
+            mockLogger.SetupGet(x => x.Debug).Returns(action);
+
+            var getInspectionService = new GetInspectionsService(mockLogger.Object, Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
 
             var invalidUrl = "abc";
-            var res = getInspectionService.GetInspectionsDetail(invalidUrl);
+         
+            Assert.Throws<UrlReadingException>(() => getInspectionService.GetInspectionsDetail(invalidUrl));
 
-            Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
-                "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
-            Assert.IsTrue(res.NotProcessedMessage.StartsWith($"Error whilst trying to read url: [{invalidUrl}], message: ["), "Message returned from error is not as expected");
+            mockLogger.Verify(x => x.Debug, Times.Exactly(2));
+            Assert.IsTrue(errorMessageString.StartsWith("Error whilst trying to read url: ["), "Logged Error message does not contain expected words");
+            Assert.IsNotNull(errorException);
+            Assert.IsTrue(errorException.Message.StartsWith("Error whilst trying to read url: ["), "Exception message does not contain expected words");
         }
 
         [Test]
         public void TestALinkThatIsNotExcel()
         {
-            var getInspectionService = new GetInspectionsService(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockLogger = new Mock<ILogFunctions>();
+            var errorMessageString = string.Empty;
+            Exception errorException = null;
+            var errorAction = new Action<string, Exception>((message, exception) =>
+            {
+                errorMessageString = message;
+                errorException = exception;
+            });
+            mockLogger.SetupGet(x => x.Error).Returns(errorAction);
+            var action = new Action<string>(message => { });
+
+            mockLogger.SetupGet(x => x.Debug).Returns(action);
+
+            var getInspectionService = new GetInspectionsService(mockLogger.Object, Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
 
             var urlWithoutExcel = "http://www.google.com";
-            var res = getInspectionService.GetInspectionsDetail(urlWithoutExcel);
-
-            Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
-                "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
-            Assert.IsTrue(res.NotProcessedMessage.StartsWith($"Error whilst trying to read excel details from url: [{urlWithoutExcel}], message: ["), "Message returned from error is not as expected");
+      
+            Assert.Throws<UrlReadingException>(() => getInspectionService.GetInspectionsDetail(urlWithoutExcel));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(3));
+            Assert.IsTrue(errorMessageString.StartsWith("Error whilst trying to read excel details from url: ["), "Logged Error message does not contain expected words");
+            Assert.IsNotNull(errorException);
+            Assert.IsTrue(errorException.Message.StartsWith("Error whilst trying to read excel details from url: ["), "Exception message does not contain expected words");
         }
     }
 }

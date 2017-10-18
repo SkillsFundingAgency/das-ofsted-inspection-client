@@ -9,6 +9,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
     {
         private readonly IHttpGet _httpGet;
 
+        internal AngleSharpService() : this(new HttpService())
+        {
+        }
+
         public AngleSharpService(IHttpGet httpGet)
         {
             this._httpGet = httpGet;

@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\InvalidLinkException.cs" />
+    <Compile Include="Exceptions\NoLinksInPageException.cs" />
+    <Compile Include="Exceptions\UrlReadingException.cs" />
     <Compile Include="InspectionsStatusCode.cs" />
     <Compile Include="OfstedInspection.cs" />
     <Compile Include="InspectionError.cs" />

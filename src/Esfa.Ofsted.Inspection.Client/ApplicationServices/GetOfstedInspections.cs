@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types.Exceptions;
 
 namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
 {
@@ -15,23 +15,38 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private readonly IGetInspectionsService _getInspectionsService;
         private readonly IAngleSharpService _angleSharpService;
         private readonly IConfigurationSettings _configurationSettings;
+        private readonly ILogFunctions _logger;
 
         /// <summary>
-        /// default constructor
+        /// GetOfstedInspections with default logging
         /// </summary>
-        public GetOfstedInspections() : this(new AngleSharpService(new HttpService()), 
-                                            new ConfigurationSettings(), 
-                                            new GetInspectionsService(new GetOfstedDetailsFromExcelPackageService(
-                                                                                new ProcessExcelFormulaToLink(), 
-                                                                                new OverallEffectivenessProcessor(), 
-                                                                                new ConfigurationSettings())))
+        public GetOfstedInspections() : this(new LogFunctions(),
+                                             new AngleSharpService(), 
+                                             new ConfigurationSettings(), 
+                                             new GetInspectionsService()
+                                            )
         {}
 
-        internal GetOfstedInspections(IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
+        /// <summary>
+        /// GetOfstedInspections with logging overrides available
+        /// </summary>
+        public GetOfstedInspections(ILogFunctions logger) : 
+            this(logger,
+                new AngleSharpService(),
+                new ConfigurationSettings(),
+                new GetInspectionsService(logger, 
+                                          new GetOfstedDetailsFromExcelPackageService(logger))
+        )
+        {
+            _logger = logger;
+        }
+
+        internal GetOfstedInspections(ILogFunctions logger, IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
         {
             _angleSharpService = angleSharpService;
             _configurationSettings = configurationSettings;
             _getInspectionsService = getInspectionsService;
+            _logger = logger;
         }
 
 
@@ -41,23 +56,41 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// <returns>A set of inspection details giving website, ukrpn, date ofsted results published, and effectiveness rating</returns>
         public InspectionsDetail GetAll()
         {
-            var getFirstMatchingLink = _angleSharpService.GetLinks(_configurationSettings.InspectionSiteUrl, "a", _configurationSettings.LinkText).FirstOrDefault();
+            _logger.Info("Start: gathering of Ofsted details");
+             var getFirstMatchingLink = GetFirstMatchingLink();
+            _logger.Debug("First Link retrieved");
+            var firstLinkUrl = BuildFullLinkFromRelativeFirstLink(getFirstMatchingLink);
+            _logger.Debug($"First link built: '{firstLinkUrl}'");
+            var result = _getInspectionsService.GetInspectionsDetail(firstLinkUrl);
+            _logger.Info("End: All Ofsted details returned");
+            return result;
+        }
 
-            if (getFirstMatchingLink==null)
-                {
-                return RaiseNotProcessedInspectionError($"Could not locate any links in page [{_configurationSettings.InspectionSiteUrl}] with text [{_configurationSettings.LinkText}]");
-                }
-
+        private string BuildFullLinkFromRelativeFirstLink(string getFirstMatchingLink)
+        {
             var firstLinkUrl = BuildFirstLinkUrl(getFirstMatchingLink);
 
-            if (firstLinkUrl == string.Empty)
-                {
-                return RaiseNotProcessedInspectionError($"Could not build a valid url from url [{_configurationSettings.InspectionSiteUrl}], link [{getFirstMatchingLink}]");
-                }
+            if (firstLinkUrl != string.Empty) return firstLinkUrl;
 
-            return _getInspectionsService.GetInspectionsDetail(firstLinkUrl);
+            var noFirstLinkValid =
+                $"Could not build a valid url from url [{_configurationSettings.InspectionSiteUrl}], link [{getFirstMatchingLink}]";
+            _logger.Error(noFirstLinkValid, new InvalidLinkException(noFirstLinkValid));
+            throw new InvalidLinkException(noFirstLinkValid);
         }
-        
+
+        private string GetFirstMatchingLink()
+        {
+            var getFirstMatchingLink = _angleSharpService
+                .GetLinks(_configurationSettings.InspectionSiteUrl, "a", _configurationSettings.LinkText).FirstOrDefault();
+
+            if (getFirstMatchingLink != null) return getFirstMatchingLink;
+
+            var noLinksInPageMessage =
+                $"Could not locate any links in page [{_configurationSettings.InspectionSiteUrl}] with text [{_configurationSettings.LinkText}]";
+            _logger.Error(noLinksInPageMessage, new NoLinksInPageException(noLinksInPageMessage));
+            throw new NoLinksInPageException(noLinksInPageMessage);
+        }
+
         private string BuildFirstLinkUrl(string getFirstMatchingLink)
         {
             Uri uriResult;
@@ -68,13 +101,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             return firstLinkUrl;
         }
 
-        private static InspectionsDetail RaiseNotProcessedInspectionError(string message)
-        {
-            return new InspectionsDetail
-            {
-                StatusCode = InspectionsStatusCode.NotProcessed,
-                NotProcessedMessage = message
-            };
-        }
     }
+
+
 }

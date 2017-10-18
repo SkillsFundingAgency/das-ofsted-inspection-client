@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using OfficeOpenXml;
 using Esfa.Ofsted.Inspection.Types;
@@ -16,14 +17,29 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
         private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
         private readonly IConfigurationSettings _configurationSettings;
+        private ILogFunctions _logger;
 
-        public GetOfstedDetailsFromExcelPackageService(IProcessExcelFormulaToLink processExcelFormulaToLink, 
+        public GetOfstedDetailsFromExcelPackageService(ILogFunctions logger) : this(logger,
+            new ProcessExcelFormulaToLink(),
+            new OverallEffectivenessProcessor(),
+            new ConfigurationSettings())
+        {}
+
+        public GetOfstedDetailsFromExcelPackageService() : this(new LogFunctions(),
+                                                                new ProcessExcelFormulaToLink(),
+                                                                new OverallEffectivenessProcessor(),
+                                                                new ConfigurationSettings())
+        {}
+
+        public GetOfstedDetailsFromExcelPackageService( ILogFunctions logger,
+                                                        IProcessExcelFormulaToLink processExcelFormulaToLink, 
                                                         IOverallEffectivenessProcessor overallEffectivenessProcessor,
                                                         IConfigurationSettings configurationSettings)
         {
             _processExcelFormulaToLink = processExcelFormulaToLink;
             _overallEffectivenessProcessor = overallEffectivenessProcessor;
             _configurationSettings = configurationSettings;
+            _logger = logger;
         }
 
         public InspectionsDetail ExtractOfstedInspections(ExcelPackage package)

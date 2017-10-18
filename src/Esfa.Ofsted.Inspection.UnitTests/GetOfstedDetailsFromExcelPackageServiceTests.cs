@@ -18,7 +18,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         {
             var excelPackage = CreateBasicExcelSpreadsheetForTesting();
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
+                = new GetOfstedDetailsFromExcelPackageService(null,Mock.Of<IProcessExcelFormulaToLink>(),
                     Mock.Of<OverallEffectivenessProcessor>(), Mock.Of<IConfigurationSettings>());
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
@@ -41,7 +41,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(focusWorksheet);
 
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(Mock.Of<IProcessExcelFormulaToLink>(),
+                = new GetOfstedDetailsFromExcelPackageService(null,Mock.Of<IProcessExcelFormulaToLink>(),
                     Mock.Of<IOverallEffectivenessProcessor>(), mockConfigurationSettings.Object);
 
             var excelWorksheet = excelPackage.Workbook.Worksheets[2];
@@ -82,7 +82,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
 
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
+                = new GetOfstedDetailsFromExcelPackageService(null,mockProcessExcelFormulaToLink.Object,
                     mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
@@ -127,7 +127,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 .Returns(OverallEffectiveness.Inadequate);
 
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
+                = new GetOfstedDetailsFromExcelPackageService(null,mockProcessExcelFormulaToLink.Object,
                     mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
@@ -187,7 +187,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 .Returns(OverallEffectiveness.Inadequate);
 
             var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(mockProcessExcelFormulaToLink.Object,
+                = new GetOfstedDetailsFromExcelPackageService(null,mockProcessExcelFormulaToLink.Object,
                     mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);

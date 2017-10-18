@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="ApplicationServices\GetOfstedInspections.cs" />
     <Compile Include="ApplicationServices\IGetOfstedInspections.cs" />
+    <Compile Include="ApplicationServices\ILogFunctions.cs" />
+    <Compile Include="ApplicationServices\LogFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConfigurationResources.Designer.cs">
       <AutoGen>True</AutoGen>

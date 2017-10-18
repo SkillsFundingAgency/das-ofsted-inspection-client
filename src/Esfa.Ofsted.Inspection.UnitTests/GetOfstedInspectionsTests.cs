@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types.Exceptions;
 using Moq;
 using NUnit.Framework;
 
@@ -11,6 +13,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
     [TestFixture]
     public class GetOfstedInspectionsTests
     {
+      
         [Test]
         public void ShouldReturnResultsWithoutErroring()
         {
@@ -28,14 +31,28 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                                                            Inspections = new List<OfstedInspection> {new OfstedInspection()},
                                                            ErrorSet = null};
 
+            var mockLogger = new Mock<ILogFunctions>();
+
+            var messageString = string.Empty;
+            var action = new Action<string>(message => {messageString = message;});
+
+            mockLogger.SetupGet(x => x.Info).Returns(action);
+            mockLogger.SetupGet(x => x.Debug).Returns(action);
+
+
             mockGetInspectionsService.Setup(x => x.GetInspectionsDetail(It.IsAny<string>())).Returns(inspectionDetail);
 
             var getOfstedInspections =
-                new GetOfstedInspections(mockAngleSharpService.Object,
-                    mockConfigurationSettings.Object,
-                    mockGetInspectionsService.Object);
+                new GetOfstedInspections(mockLogger.Object,
+                                         mockAngleSharpService.Object,
+                                         mockConfigurationSettings.Object,
+                                         mockGetInspectionsService.Object);
 
             var res = getOfstedInspections.GetAll();
+
+            mockLogger.VerifyAll();
+            mockLogger.Verify(x => x.Info, Times.Exactly(2));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(2));
 
             Assert.AreEqual(InspectionsStatusCode.Success, res.StatusCode, $"The expected status code was success, but actual was [{res.StatusCode}]");
             Assert.IsNotNull(res.Inspections,$"The inspections should have some values, but was null");
@@ -53,23 +70,41 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 .Returns(new List<string>());
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
-            var mockGetInspectionsService = new Mock<GetInspectionsService>(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockLogger = new Mock<ILogFunctions>();
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object, Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
 
             mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
             mockConfigurationSettings.Setup(x => x.LinkText).Returns("linkText Goes Here");
+        
+            var errorMessageString = string.Empty;
+            Exception errorException = null;
+            var errorAction = new Action<string, Exception>((message, exception) =>
+            {
+                errorMessageString = message;
+                errorException = exception;
+            });
+            mockLogger.SetupGet(x => x.Error).Returns(errorAction);
+
+            var action = new Action<string>(message => { });
+
+            mockLogger.SetupGet(x => x.Info).Returns(action);
+            mockLogger.SetupGet(x => x.Debug).Returns(action);
+
             var getOfstedInspections =
-                new GetOfstedInspections(mockAngleSharpService.Object,
+                new GetOfstedInspections(
+                    mockLogger.Object,
+                    mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,
-                    mockGetInspectionsService.Object);
+                    mockGetInspectionsService.Object
+                );
 
-            var res = getOfstedInspections.GetAll();
-
-            Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode,
-                "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The actual was not the expected null");
-            Assert.IsNull(res.ErrorSet, $"The actual errorset was not null, instead of null");
-            Assert.IsTrue(res.NotProcessedMessage.StartsWith("Could not locate any links in page"), 
-                        $"The actual message didn't contain the expected words. Message was: [{res.NotProcessedMessage}]");
+           
+            Assert.Throws<NoLinksInPageException>(() => getOfstedInspections.GetAll());
+            mockLogger.Verify(x => x.Info, Times.Exactly(1));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(0));
+            Assert.IsTrue(errorMessageString.StartsWith("Could not locate any links in page ["), "Logged Error message does not contain expected words");
+            Assert.IsNotNull(errorException);
+            Assert.IsTrue(errorException.Message.StartsWith("Could not locate any links in page ["), "Exception message does not contain expected words");
         }
 
         [Test]
@@ -81,21 +116,38 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("badurl");
-            var mockGetInspectionsService = new Mock<GetInspectionsService>(Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockLogger = new Mock<ILogFunctions>();
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object,Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+         
+            var errorMessageString = string.Empty;
+            Exception errorException = null;
+            var errorAction = new Action<string, Exception>((message, exception) => 
+                    {
+                    errorMessageString = message;
+                    errorException = exception;
+                    });
+            mockLogger.SetupGet(x => x.Error).Returns(errorAction);
+
+            var messageString = string.Empty;
+            var action = new Action<string>(message => { messageString = message; });
+
+            mockLogger.SetupGet(x => x.Info).Returns(action);
+            mockLogger.SetupGet(x => x.Debug).Returns(action);
 
             var getOfstedInspections =
-                new GetOfstedInspections(mockAngleSharpService.Object,
+                new GetOfstedInspections(
+                    mockLogger.Object,
+                    mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,
                     mockGetInspectionsService.Object
                 );
-
-            var res = getOfstedInspections.GetAll();
-
-            Assert.AreEqual(InspectionsStatusCode.NotProcessed, res.StatusCode, "The status code returned was not 'NotProcessed'");
-            Assert.IsNull(res.Inspections, $"The actual inspections was not the expected null");
-            Assert.IsNull(res.ErrorSet, $"The actual errorset was not the expected null");
-            Assert.IsTrue(res.NotProcessedMessage.StartsWith("Could not build a valid url from url"), 
-                                $"The actual message didn't contain the expected words. Message was: [{res.NotProcessedMessage}]");
+   
+            Assert.Throws<InvalidLinkException>(() => getOfstedInspections.GetAll());
+            mockLogger.Verify(x => x.Info, Times.Exactly(1));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(1));
+            Assert.IsTrue(errorMessageString.StartsWith("Could not build a valid url from url ["), "Logged Error message does not contain expected words");
+            Assert.IsNotNull(errorException);
+            Assert.IsTrue(errorException.Message.StartsWith("Could not build a valid url from url ["), "Exception message does not contain expected words");
         }
     }
 }
