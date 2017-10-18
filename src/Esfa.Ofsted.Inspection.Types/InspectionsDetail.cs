@@ -19,7 +19,5 @@ namespace Esfa.Ofsted.Inspection.Types
         /// Status Code of returned details (success, processed with 1 or more errors, not processed)
         /// </summary>
         public InspectionsStatusCode StatusCode { get; set; }
-
-        public string NotProcessedMessage { get; set; }
     }
 }

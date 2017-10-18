@@ -5,6 +5,7 @@ using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using OfficeOpenXml;
 using Esfa.Ofsted.Inspection.Types;
+using Esfa.Ofsted.Inspection.Types.Exceptions;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
@@ -17,7 +18,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
         private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
         private readonly IConfigurationSettings _configurationSettings;
-        private ILogFunctions _logger;
+        private readonly ILogFunctions _logger;
 
         public GetOfstedDetailsFromExcelPackageService(ILogFunctions logger) : this(logger,
             new ProcessExcelFormulaToLink(),
@@ -51,14 +52,20 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var keyWorksheet = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == _configurationSettings.WorksheetName);
             if (keyWorksheet == null)
             {
-                 return CreateProcessedDetail(errorSet, $@"No worksheet found in the datasource that matches '{_configurationSettings.WorksheetName}'");
+                var message = $@"No worksheet found in the datasource that matches '{_configurationSettings.WorksheetName}'";
+                var exception = new NoWorksheetPresentException(message);
+                _logger.Error(message, exception);
+                throw exception;
             }
 
             var lineNumberStart = FindStartingLineNumber(keyWorksheet);
 
             if (lineNumberStart == 0)
             {
-                return CreateProcessedDetail(errorSet, "No details could be found when processing");
+                const string message = "No details could be found when processing";
+                var exception = new NoDetailsException(message);
+                _logger.Error(message, exception);
+                throw exception;
             }
 
             for (var lineNumber = lineNumberStart; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
@@ -66,9 +73,15 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 statusCode = ProcessLineIntoDetailsAsDetailOrError(keyWorksheet, lineNumber, inspections, errorSet, statusCode);
             }
 
-            return inspections.Count == 0 
-                 ? CreateProcessedDetail(errorSet, "No inspections were processed successfully")
-                 : new InspectionsDetail { Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode};
+            if (inspections.Count == 0)
+            {
+                const string message = "No inspections were processed successfully";
+                var exception = new NoDetailsException(message);
+                _logger.Error(message, exception);
+                throw exception;
+            }
+
+            return new InspectionsDetail { Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode};
         }
 
         private InspectionsStatusCode ProcessLineIntoDetailsAsDetailOrError(ExcelWorksheet keyWorksheet, int lineNumber, 
@@ -85,25 +98,18 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             {
                 AddInspectionData((int) ukprn, url, (DateTime) datePublished, (OverallEffectiveness) overallEffectiveness,
                     inspections);
+                _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {datePublished}, {overallEffectiveness}");
             }
             else
             {
                 errorSet.Add(error);
                 statusCode = InspectionsStatusCode.ProcessedWithErrors;
+                _logger.Debug($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
             }
             return statusCode;
         }
 
-        private static InspectionsDetail CreateProcessedDetail(List<InspectionError> errorSet, string message)
-        {
-            return new InspectionsDetail
-            {
-                Inspections = new List<OfstedInspection>(),
-                ErrorSet = errorSet,
-                StatusCode = InspectionsStatusCode.NotProcessed,
-                NotProcessedMessage = message
-            };
-        }
+       
 
         private static int FindStartingLineNumber(ExcelWorksheet keyWorksheet)
         {

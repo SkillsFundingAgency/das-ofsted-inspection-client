@@ -48,7 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\InvalidLinkException.cs" />
+    <Compile Include="Exceptions\NoDetailsException.cs" />
     <Compile Include="Exceptions\NoLinksInPageException.cs" />
+    <Compile Include="Exceptions\NoWorksheetPresentException.cs" />
     <Compile Include="Exceptions\UrlReadingException.cs" />
     <Compile Include="InspectionsStatusCode.cs" />
     <Compile Include="OfstedInspection.cs" />
