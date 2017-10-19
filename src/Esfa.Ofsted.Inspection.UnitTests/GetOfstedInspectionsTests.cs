@@ -71,7 +71,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             var mockLogger = new Mock<ILogFunctions>();
-            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object, Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object, Mock.Of<IGetOfstedDetailsFromExcelPackageService>(), Mock.Of<IWebClientFactory>());
 
             mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("http://www.test.com/test2");
             mockConfigurationSettings.Setup(x => x.LinkText).Returns("linkText Goes Here");
@@ -117,7 +117,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             mockConfigurationSettings.Setup(x => x.InspectionSiteUrl).Returns("badurl");
             var mockLogger = new Mock<ILogFunctions>();
-            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object,Mock.Of<IGetOfstedDetailsFromExcelPackageService>());
+            var mockGetInspectionsService = new Mock<GetInspectionsService>(mockLogger.Object,Mock.Of<IGetOfstedDetailsFromExcelPackageService>(), Mock.Of<IWebClientFactory>());
          
             var errorMessageString = string.Empty;
             Exception errorException = null;

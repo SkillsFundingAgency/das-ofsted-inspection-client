@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AngleSharp.Parser.Html;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
@@ -31,7 +32,8 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var allMatchingItems = result.QuerySelectorAll(selector);
 
             return allMatchingItems
-                .Where(x => x.InnerHtml.Contains(textInTitle)).Select(x => x.GetAttribute("href"))
+                .Where(x => x.InnerHtml.Trim().StartsWith(textInTitle, StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.GetAttribute("href"))
                 .ToList();
         }
     }

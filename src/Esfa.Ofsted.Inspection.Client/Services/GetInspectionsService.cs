@@ -14,14 +14,16 @@ namespace Esfa.Ofsted.Inspection.Client.Services
     {
         private readonly IGetOfstedDetailsFromExcelPackageService _getOfstedDetailsFromExcelPackageService;
         private readonly ILogFunctions _logger;
+        private readonly IWebClientFactory _webClientFactory;
 
-        public GetInspectionsService() : this(new LogFunctions(), new GetOfstedDetailsFromExcelPackageService())
+        public GetInspectionsService() : this(new LogFunctions(), new GetOfstedDetailsFromExcelPackageService(), new SystemWebClientFactory())
         { }
         
-        public GetInspectionsService(ILogFunctions logger, IGetOfstedDetailsFromExcelPackageService getOfstedDetailsFromExcelPackageService)
+        public GetInspectionsService(ILogFunctions logger, IGetOfstedDetailsFromExcelPackageService getOfstedDetailsFromExcelPackageService, IWebClientFactory webClientFactory)
         {
             _logger = logger;
             _getOfstedDetailsFromExcelPackageService = getOfstedDetailsFromExcelPackageService;
+            _webClientFactory = webClientFactory;
         }
 
         public InspectionsDetail GetInspectionsDetail(string firstLinkUrl)
@@ -31,7 +33,9 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             {
                 _logger.Debug("Opening web client");
 
-                using (var client = new WebClient())
+                var webClient = _webClientFactory.Create();
+
+                using (var client = webClient)
                 {
                     _logger.Debug("Opening memory stream");
                     using (var stream =
@@ -60,6 +64,13 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                var exception = new UrlReadingException(message, ex);
                _logger.Error(message, exception);
                throw exception;
+            }
+            catch (Exception ex)
+            {
+                var message = $"Error whilst trying to read excel details";
+                var exception = new UrlReadingException(message, ex);
+                _logger.Error(message, exception);
+                throw exception;
             }
 
             return inspectionsDetail;

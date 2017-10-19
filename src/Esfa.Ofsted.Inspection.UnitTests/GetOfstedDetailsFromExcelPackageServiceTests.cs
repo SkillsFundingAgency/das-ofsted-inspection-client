@@ -13,7 +13,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
     [TestFixture]
     public class GetOfstedDetailsFromExcelPackageServiceTests
     {
-        const string FocusWorksheet = "worksheet with details";
+        private const string FocusWorksheet = "worksheet with details";
 
         [Test]
         public void ShouldErrorAsInvalidExcelPackagePassedIn()
@@ -46,8 +46,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         {
             var excelPackage = CreateBasicExcelSpreadsheetForTesting();
 
-            var hyperlink =
-                "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
+            const string hyperlink = "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
 
             const string focusWorksheet = "worksheet with details";
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
@@ -82,10 +81,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [Test]
         public void ShouldReturnSuccessWithExpectedNumberOfDetailsAndNoErrors()
         {
-            var hyperlink =
-                "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
-            var hyperlinkResult = @"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805";
-
+            const string hyperlink = "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
+      
             var excelPackage = CreateBasicExcelSpreadsheetForTesting();
             var excelWorksheet = excelPackage.Workbook.Worksheets[FocusWorksheet];
 
@@ -96,8 +93,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
 
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>())).Returns((string)null);
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(hyperlink)).Returns(hyperlinkResult);
+            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns((string)null);
 
             var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
             mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
@@ -122,10 +118,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [Test]
         public void ShouldReturnProcessedWithErrorsWithExpectedNumberOfDetailsAndSomeErrors()
         {
-            var hyperlink =
-                "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
-            var hyperlinkResult = @"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805";
-
+            const string hyperlink = "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
+    
             var excelPackage = CreateBasicExcelSpreadsheetForTesting();
             var excelWorksheet = excelPackage.Workbook.Worksheets[FocusWorksheet];
 
@@ -142,9 +136,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
 
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>())).Returns((string)null);
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(hyperlink)).Returns(hyperlinkResult);
-
+            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(),It.IsAny<string>())).Returns((string)null);
+ 
             var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
             mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
                 .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);
@@ -190,11 +183,6 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [Test]
         public void ShouldReturnErrorWithNoDetailsAndSomeErrors()
         {
-            var hyperlink =
-                "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
-            var hyperlinkResult = @"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805";
-
-
             var excelPackage = CreateBasicExcelSpreadsheetForTesting();
             var excelWorksheet = excelPackage.Workbook.Worksheets[FocusWorksheet];
 
@@ -207,9 +195,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
 
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>())).Returns((string)null);
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(hyperlink)).Returns(hyperlinkResult);
-
+            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns((string)null);
+     
             var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
             mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
                 .Returns(OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert);

@@ -20,7 +20,6 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 case "9":
                     return OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert;
                 case "-":
-                    return OverallEffectiveness.NotJudged;
                 case null:
                     return OverallEffectiveness.NotJudged;
                 default:

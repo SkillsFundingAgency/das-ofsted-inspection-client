@@ -1,23 +1,27 @@
-﻿using System;
-using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+﻿using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
     internal class ProcessExcelFormulaToLink : IProcessExcelFormulaToLink
     {
-        public string GetLinkFromFormula(string hyperlinkFormula)
+        public string GetLinkFromFormula(string hyperlinkFormula, string text)
         {
-            var splitDetails = hyperlinkFormula.Split('"');
-            if (splitDetails.Length < 2)
+            var urlFromHyperlink = ProcessFormulaToExtractUrl(hyperlinkFormula);
+
+            if (urlFromHyperlink != string.Empty)
+                return urlFromHyperlink;
+
+          return !string.IsNullOrEmpty(text) ? text.Trim() : string.Empty;
+        }
+
+        private static string ProcessFormulaToExtractUrl(string hyperlinkFormula)
+        {
+            if (hyperlinkFormula == null)
                 return string.Empty;
 
-            var url = splitDetails[1].Trim();
+            var splitDetails = hyperlinkFormula.Split('"');
 
-            Uri uriResult;
-            var result = Uri.TryCreate(url, UriKind.Absolute, out uriResult)
-                          && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-
-            return result == false ? string.Empty : url;
+            return splitDetails.Length < 2 ? string.Empty : splitDetails[1].Trim();
         }
     }
 }

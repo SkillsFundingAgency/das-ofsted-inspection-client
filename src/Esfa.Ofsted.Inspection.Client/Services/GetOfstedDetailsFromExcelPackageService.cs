@@ -76,7 +76,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             if (inspections.Count == 0)
             {
                 const string message = "No inspections were processed successfully";
-                var exception = new NoDetailsException(message);
+                var exception = new NoDetailsException(message, errorSet);
                 _logger.Error(message, exception);
                 throw exception;
             }
@@ -89,10 +89,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         {
             var error = new InspectionError {LineNumber = lineNumber};
 
-            var ukprn = ProcessUkprnForError(keyWorksheet, lineNumber, error);
-            var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[lineNumber, WebLinkPosition].Formula);
-            var overallEffectiveness = ProcessOverallEffectivenessForError(keyWorksheet, lineNumber, error);
-            var datePublished = ProcessDatePublishedForError(keyWorksheet, lineNumber, error);
+            var ukprn = ProcessUkprnForError(Convert.ToString(keyWorksheet.Cells[lineNumber, UkprnPosition].Value), error);
+            var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[lineNumber, WebLinkPosition].Formula, keyWorksheet.Cells[lineNumber, WebLinkPosition].Text);
+            var overallEffectiveness = ProcessOverallEffectivenessForError(Convert.ToString(keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value), error);
+            var datePublished = ProcessDatePublishedForError(keyWorksheet.Cells[lineNumber, DatePublishedPosition], error);
 
             if (ukprn != null && overallEffectiveness != null && datePublished != null)
             {
@@ -137,39 +137,31 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             inspections.Add(inspectionData);
         }
 
-        private static DateTime? ProcessDatePublishedForError(ExcelWorksheet keyWorksheet, int lineNumber,
+        private static DateTime? ProcessDatePublishedForError(ExcelRange cell,
             InspectionError error)
         {
-            var datePublishedString = keyWorksheet.Cells[lineNumber, DatePublishedPosition]?.Value?.ToString();
-            var datePublished = GetDateTimeValue(keyWorksheet.Cells[lineNumber, DatePublishedPosition]);
+            var datePublishedString = cell?.Value?.ToString();
+            var datePublished = GetDateTimeValue(cell);
             error.DatePublished = datePublishedString;
-            error.Message = $"'{datePublishedString}' could not be converted to date";
             return datePublished;
         }
 
-        private OverallEffectiveness? ProcessOverallEffectivenessForError(ExcelWorksheet keyWorksheet, int lineNumber, InspectionError error)
+        private OverallEffectiveness? ProcessOverallEffectivenessForError(string value, InspectionError error)
         {
-            var overallEffectivenessString = keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value?.ToString();
+            var overallEffectivenessString = value;
             var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
             error.OverallEffectiveness = overallEffectivenessString;
-            error.Message = $"'{overallEffectivenessString}' could not be converted to overallEffectiveness";
             return overallEffectiveness;
         }
 
-        private static int? ProcessUkprnForError(ExcelWorksheet keyWorksheet, int lineNumber, InspectionError error)
+        private static int? ProcessUkprnForError(string value, InspectionError error)
         {
-            var ukprnString = keyWorksheet.Cells[lineNumber, UkprnPosition].Value != null
-                ? keyWorksheet.Cells[lineNumber, UkprnPosition].Value.ToString()
-                : string.Empty;
+            var ukprnString = value ?? string.Empty;
             error.Ukprn = ukprnString;
             int ukprn;
-            if (!int.TryParse(ukprnString, out ukprn))
-            {
-                error.Message = $"'{ukprnString}' could not be converted to overallEffectiveness";
-                return null;
-            }
-        
-        return ukprn;
+            if (int.TryParse(ukprnString, out ukprn)) return ukprn;
+
+            return null;
         }
 
 

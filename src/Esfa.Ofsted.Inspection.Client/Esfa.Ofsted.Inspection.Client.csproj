@@ -73,8 +73,14 @@
     <Compile Include="Services\Interfaces\IOverallEffectivenessProcessor.cs" />
     <Compile Include="Services\Interfaces\IProcessExcelFormulaToLink.cs" />
     <Compile Include="Services\AngleSharpService.cs" />
+    <Compile Include="Services\Interfaces\IWebClient.cs" />
+    <Compile Include="Services\Interfaces\IWebClientFactory.cs" />
     <Compile Include="Services\OverallEffectivenessProcessor.cs" />
     <Compile Include="Services\ProcessExcelFormulaToLink.cs" />
+    <Compile Include="Services\SystemWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Services\SystemWebClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Esfa.Ofsted.Inspection.Types\Esfa.Ofsted.Inspection.Types.csproj">

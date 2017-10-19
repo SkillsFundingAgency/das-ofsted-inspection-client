@@ -35,7 +35,8 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
                 new AngleSharpService(),
                 new ConfigurationSettings(),
                 new GetInspectionsService(logger, 
-                                          new GetOfstedDetailsFromExcelPackageService(logger))
+                                          new GetOfstedDetailsFromExcelPackageService(logger), 
+                                          new SystemWebClientFactory())
         )
         {
             _logger = logger;
@@ -58,7 +59,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         {
             _logger.Info("Start: gathering of Ofsted details");
              var getFirstMatchingLink = GetFirstMatchingLink();
-            _logger.Debug("First Link retrieved");
+            _logger.Debug($"First Link retrieved {getFirstMatchingLink}");
             var firstLinkUrl = BuildFullLinkFromRelativeFirstLink(getFirstMatchingLink);
             _logger.Debug($"First link built: '{firstLinkUrl}'");
             var result = _getInspectionsService.GetInspectionsDetail(firstLinkUrl);

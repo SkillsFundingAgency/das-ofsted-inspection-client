@@ -24,5 +24,13 @@ namespace Esfa.Ofsted.Inspection.Types.Exceptions
         public NoDetailsException(string message)
             : base(message)
         { }
+
+        /// <summary>
+        /// NoDetailsException with more detailed message, and list of specific errors
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="inspectionErrors"></param>
+        public NoDetailsException(string message, List<InspectionError> inspectionErrors): base(message)
+        { }
     }
 }

@@ -2,7 +2,7 @@
 {
     internal interface IProcessExcelFormulaToLink
     {
-        string GetLinkFromFormula(string hyperlinkFormula);
+        string GetLinkFromFormula(string hyperlinkFormula, string cellText);
 
     }
 }
