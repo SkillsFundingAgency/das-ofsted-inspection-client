@@ -16,10 +16,6 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// </summary>
         Action<string> Info { get; set; }
         /// <summary>
-        /// Method called for Warning status with exception
-        /// </summary>
-        Action<string, Exception> Warn { get; set; }
-        /// <summary>
         /// Method called for Error status with Exception
         /// </summary>
         Action<string, Exception> Error { get; set; }
