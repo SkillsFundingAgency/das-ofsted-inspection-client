@@ -33,8 +33,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockLogger = new Mock<ILogFunctions>();
 
-            var messageString = string.Empty;
-            var action = new Action<string>(message => {messageString = message;});
+            var action = new Action<string>(message => { });
 
             mockLogger.SetupGet(x => x.Info).Returns(action);
             mockLogger.SetupGet(x => x.Debug).Returns(action);
@@ -128,8 +127,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                     });
             mockLogger.SetupGet(x => x.Error).Returns(errorAction);
 
-            var messageString = string.Empty;
-            var action = new Action<string>(message => { messageString = message; });
+            var action = new Action<string>(message => { });
 
             mockLogger.SetupGet(x => x.Info).Returns(action);
             mockLogger.SetupGet(x => x.Debug).Returns(action);

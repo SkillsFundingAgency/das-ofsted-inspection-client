@@ -13,7 +13,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [TestCase("4", OverallEffectiveness.Inadequate)]
         [TestCase("9", OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert)]
         [TestCase("-", OverallEffectiveness.NotJudged)]
-        [TestCase((string) null, OverallEffectiveness.NotJudged)]
+        [TestCase(null, OverallEffectiveness.NotJudged)]
        
         public void ShouldReturnStringModifiedForUrlUsage(string inputText, OverallEffectiveness expectedEffectiveness)
         {

@@ -62,7 +62,6 @@
     <Compile Include="GetInspectionServiceTests.cs" />
     <Compile Include="GetOfstedDetailsFromExcelPackageServiceTests.cs" />
     <Compile Include="GetOfstedInspectionsTests.cs" />
-    <Compile Include="IntegrationTests.cs" />
     <Compile Include="OverallEffectivenessProcessorTests.cs" />
     <Compile Include="ProcessExcelFormulaToLinkTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

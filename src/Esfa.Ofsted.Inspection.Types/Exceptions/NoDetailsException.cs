@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Esfa.Ofsted.Inspection.Types.Exceptions
 {
@@ -19,7 +15,7 @@ namespace Esfa.Ofsted.Inspection.Types.Exceptions
         }
 
         /// <summary>
-        /// NoDetailsException with more detailed message.  If individual line errors are present, then these can be found in the Exception.Data array
+        /// NoDetailsException with more detailed message.  If individual line errors are present, then these can be found in the Exception.Data Dictionary
         /// </summary>
         /// <param name="message"></param>
         public NoDetailsException(string message)
