@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
@@ -70,22 +71,29 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
             for (var lineNumber = lineNumberStart; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
             {
-                statusCode = ProcessLineIntoDetailsAsDetailOrError(keyWorksheet, lineNumber, inspections, errorSet, statusCode);
+                var returnedStatusCode = ProcessLineIntoDetailsAsDetailOrError(keyWorksheet, lineNumber, inspections, errorSet);
+                if (returnedStatusCode == InspectionsStatusCode.ProcessedWithErrors)
+                    statusCode = InspectionsStatusCode.ProcessedWithErrors;
             }
 
             if (inspections.Count == 0)
             {
                 const string message = "No inspections were processed successfully";
-                var exception = new NoDetailsException(message, errorSet);
+                var exception = new NoDetailsException(message);
+                foreach (var error in errorSet)
+                {
+                    exception.Data.Add(error.LineNumber.ToString(), error);
+                }
                 _logger.Error(message, exception);
                 throw exception;
             }
 
-            return new InspectionsDetail { Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode};
+
+            return new InspectionsDetail {Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode};
         }
 
         private InspectionsStatusCode ProcessLineIntoDetailsAsDetailOrError(ExcelWorksheet keyWorksheet, int lineNumber, 
-            ICollection<OfstedInspection> inspections, ICollection<InspectionError> errorSet, InspectionsStatusCode statusCode)
+            ICollection<OfstedInspection> inspections, ICollection<InspectionError> errorSet)
         {
             var error = new InspectionError {LineNumber = lineNumber};
 
@@ -99,14 +107,14 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 AddInspectionData((int) ukprn, url, (DateTime) datePublished, (OverallEffectiveness) overallEffectiveness,
                     inspections);
                 _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {datePublished}, {overallEffectiveness}");
+                return InspectionsStatusCode.Success;
             }
-            else
-            {
-                errorSet.Add(error);
-                statusCode = InspectionsStatusCode.ProcessedWithErrors;
-                _logger.Debug($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
-            }
-            return statusCode;
+
+            error.Website = url;
+            errorSet.Add(error);
+            _logger.Debug($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
+            return InspectionsStatusCode.ProcessedWithErrors;
+
         }
 
        
@@ -140,9 +148,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private static DateTime? ProcessDatePublishedForError(ExcelRange cell,
             InspectionError error)
         {
-            var datePublishedString = cell?.Value?.ToString();
+            
             var datePublished = GetDateTimeValue(cell);
-            error.DatePublished = datePublishedString;
+            error.DatePublished = datePublished?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) 
+                                  ?? cell.Value.ToString();
             return datePublished;
         }
 

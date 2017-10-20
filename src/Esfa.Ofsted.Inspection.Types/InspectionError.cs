@@ -1,8 +1,11 @@
-﻿namespace Esfa.Ofsted.Inspection.Types
+﻿using System;
+
+namespace Esfa.Ofsted.Inspection.Types
 {
    /// <summary>
-   /// Details on line errors in processing the ofsted details (line = 0 is a file error)
+   /// Details on line errors in processing the ofsted details
    /// </summary>
+   [Serializable]
    public  class InspectionError
     {
         /// <summary>

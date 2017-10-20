@@ -9,28 +9,22 @@ namespace Esfa.Ofsted.Inspection.Types.Exceptions
     /// <summary>
     /// Exception for a page where there are no usable details
     /// </summary>
-    public class NoDetailsException: Exception
+    public class NoDetailsException : Exception
     {
         /// <summary>
         /// defauilt NoDetailsException with no message
         /// </summary>public class NoDetailsException: Exception
         public NoDetailsException()
-        { }
+        {
+        }
 
         /// <summary>
-        /// NoDetailsException with more detailed message
+        /// NoDetailsException with more detailed message.  If individual line errors are present, then these can be found in the Exception.Data array
         /// </summary>
         /// <param name="message"></param>
         public NoDetailsException(string message)
             : base(message)
-        { }
-
-        /// <summary>
-        /// NoDetailsException with more detailed message, and list of specific errors
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="inspectionErrors"></param>
-        public NoDetailsException(string message, List<InspectionError> inspectionErrors): base(message)
-        { }
+        {
+        }
     }
 }

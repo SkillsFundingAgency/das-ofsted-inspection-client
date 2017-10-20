@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
@@ -165,14 +168,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
                 Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
-                Assert.AreEqual(new DateTime(2017, 09, 29), Convert.ToDateTime(inspectionDetails.ErrorSet[0].DatePublished));
+                Assert.AreEqual("29/09/2017", inspectionDetails.ErrorSet[0].DatePublished);
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
                 Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
                 Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
                 Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
                 Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
                 Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
-                Assert.AreEqual(new DateTime(2017, 09, 28), Convert.ToDateTime(inspectionDetails.ErrorSet[2].DatePublished));
+                Assert.AreEqual("28/09/2017", inspectionDetails.ErrorSet[2].DatePublished);
                 Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
                 Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
                 Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
@@ -187,7 +190,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var excelWorksheet = excelPackage.Workbook.Worksheets[FocusWorksheet];
 
 
-            CreateRow(excelWorksheet, 7, "random", "", new DateTime(2017,09,29), "4");
+            CreateRow(excelWorksheet, 7, "random words", "", new DateTime(2017,09,29), "4");
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
             CreateRow(excelWorksheet, 9, "random", "10033443", new DateTime(2017,09,28), "x");
 
@@ -195,7 +198,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
 
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
-            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns((string)null);
+            mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns(string.Empty);
      
             var mockOverallEffectivenessProcessor = new Mock<IOverallEffectivenessProcessor>();
             mockOverallEffectivenessProcessor.Setup(x => x.GetOverallEffectiveness("9"))
@@ -227,6 +230,22 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.Verify(x => x.Error, Times.Exactly(1));
             Assert.IsTrue(errorMessageString.Equals("No inspections were processed successfully"), "Logged Error message does not contain expected words");
             Assert.IsNotNull(errorException);
+            Assert.AreEqual(3,errorException.Data.Values.Count);
+            
+            var inspectionErrorOnLine7 = (InspectionError)errorException.Data["7"];
+            var inspectionErrorOnLine9 = (InspectionError)errorException.Data["9"];
+            Assert.AreEqual(string.Empty, inspectionErrorOnLine7.Website);   
+            Assert.AreEqual("", inspectionErrorOnLine7.Ukprn);
+            Assert.AreEqual(new DateTime(2017, 09, 29).ToString("dd/MM/yyyy",CultureInfo.InvariantCulture), inspectionErrorOnLine7.DatePublished);   
+            Assert.AreEqual("4", inspectionErrorOnLine7.OverallEffectiveness);
+            Assert.IsNotEmpty(inspectionErrorOnLine7.Message);
+
+            Assert.AreEqual(string.Empty, inspectionErrorOnLine9.Website);
+            Assert.AreEqual("10033443", inspectionErrorOnLine9.Ukprn);
+            Assert.AreEqual(new DateTime(2017, 09, 28).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture), inspectionErrorOnLine9.DatePublished);
+            Assert.AreEqual("x", inspectionErrorOnLine9.OverallEffectiveness);
+            Assert.IsNotEmpty(inspectionErrorOnLine9.Message);
+    
             Assert.IsTrue(errorException.Message.Equals("No inspections were processed successfully"), "Exception message does not contain expected words");
         }
 

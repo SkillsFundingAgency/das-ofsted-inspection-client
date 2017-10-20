@@ -16,7 +16,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
         public AngleSharpService(IHttpGet httpGet)
         {
-            this._httpGet = httpGet;
+            _httpGet = httpGet;
         }
 
         public IList<string> GetLinks(string url, string selector, string textInTitle)

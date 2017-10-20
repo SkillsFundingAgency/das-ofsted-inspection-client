@@ -1,5 +1,4 @@
-﻿using System.Runtime.Remoting.Channels;
-using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+﻿using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {

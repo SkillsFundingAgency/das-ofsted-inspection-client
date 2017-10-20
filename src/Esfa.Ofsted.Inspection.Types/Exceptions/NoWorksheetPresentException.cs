@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Esfa.Ofsted.Inspection.Types.Exceptions
 {
+    /// <summary>
+    /// Worksheet required is not present exception
+    /// </summary>
     public class NoWorksheetPresentException: Exception
     {
         /// <summary>
-        /// defauilt NoWorksheetPresentException with no message
+        /// default NoWorksheetPresentException with no message
         /// </summary>public class NoWorksheetPresentException: Exception
         public NoWorksheetPresentException()
         {

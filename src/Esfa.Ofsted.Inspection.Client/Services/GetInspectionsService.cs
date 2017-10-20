@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Runtime.InteropServices;
 using Esfa.Ofsted.Inspection.Client.ApplicationServices;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
@@ -48,8 +47,14 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                             _logger.Debug("Opened excel package");
                             inspectionsDetail = _getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(package);
                         }
+                        _logger.Debug("Closed excel package");
+
                     }
+                    _logger.Debug("Closed memory stream");
+
                 }
+                _logger.Debug($"Closed web client");
+
             }
             catch (UriFormatException ex)
             {
