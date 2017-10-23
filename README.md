@@ -19,7 +19,7 @@ returns the following details
 public class InspectionsDetail
     {
         Inspections, // one or more inspection details  (Website,Ukprn,DatePublished,OverallEffectiveness)
-        ErrorSet, // zero more more error details (Website,Ukprn,DatePublished,OverallEffectiveness, lineNumber, Error Message)
+        ErrorSet, // zero or more errors (Website,Ukprn,DatePublished,OverallEffectiveness, lineNumber, Error Message)
         StatusCode // 'Success', ' ProcessedWithErrors'
     }
 ```
