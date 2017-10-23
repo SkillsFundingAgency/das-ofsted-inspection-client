@@ -11,8 +11,6 @@
 
 provides a web interface to return a full list of latest OFSTED report scores, publication dates, ukprns and website links for providers
 
-### Find all the Ofsted Inspection Details required
-
 returns the following details
 
 ``` csharp
