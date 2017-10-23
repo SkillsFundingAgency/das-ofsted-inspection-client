@@ -7,9 +7,9 @@
 | Web  | TBD |
 | Source  | https://github.com/SkillsFundingAgency/das-ofsted-inspection-client  |
 
-## A client for Ofsted Inspection Details
+## A client for latest Ofsted Inspection Details
 
-provides a web interface to return OFSTED report scores, publication dates, ukprns and website links for providers
+provides a web interface to return a full list of latest OFSTED report scores, publication dates, ukprns and website links for providers
 
 ### Find all the Ofsted Inspection Details required
 
