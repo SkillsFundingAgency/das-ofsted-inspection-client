@@ -9,7 +9,7 @@
 
 ## A client for latest Ofsted Inspection Details
 
-provides a client that returns a full list of latest OFSTED report scores, publication dates, ukprns and website links for providers
+provides a client that returns a list of latest OFSTED report scores, publication dates, ukprns and website links for providers
 
 returns the following details
 
