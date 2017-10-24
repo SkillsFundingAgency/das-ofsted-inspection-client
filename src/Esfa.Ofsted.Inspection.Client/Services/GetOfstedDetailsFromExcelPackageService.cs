@@ -44,9 +44,9 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             _logger = logger;
         }
 
-        public InspectionsDetail ExtractOfstedInspections(ExcelPackage package)
+        public InspectionOutcomesResponse ExtractOfstedInspections(ExcelPackage package)
         {
-            var inspections = new List<OfstedInspection>();
+            var inspections = new List<InspectionOutcome>();
             var errorSet = new List<InspectionError>();
             var statusCode = InspectionsStatusCode.Success;
     
@@ -64,7 +64,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             if (lineNumberStart == 0)
             {
                 const string message = "No details could be found when processing";
-                var exception = new NoDetailsException(message);
+                var exception = new MissingInspectionOutcomesException(message);  
                 _logger.Error(message, exception);
                 throw exception;
             }
@@ -79,7 +79,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             if (inspections.Count == 0)
             {
                 const string message = "No inspections were processed successfully";
-                var exception = new NoDetailsException(message);
+                var exception = new MissingInspectionOutcomesException(message); 
                 foreach (var error in errorSet)
                 {
                     exception.Data.Add(error.LineNumber.ToString(), error);
@@ -89,11 +89,11 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             }
 
 
-            return new InspectionsDetail {Inspections = inspections, ErrorSet = errorSet, StatusCode = statusCode};
+            return new InspectionOutcomesResponse {InspectionOutcomes = inspections, InspectionOutcomeErrors = errorSet, StatusCode = statusCode};
         }
 
         private InspectionsStatusCode ProcessLineIntoDetailsAsDetailOrError(ExcelWorksheet keyWorksheet, int lineNumber, 
-            ICollection<OfstedInspection> inspections, ICollection<InspectionError> errorSet)
+            ICollection<InspectionOutcome> inspections, ICollection<InspectionError> errorSet)
         {
             var error = new InspectionError {LineNumber = lineNumber};
 
@@ -112,7 +112,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
             error.Website = url;
             errorSet.Add(error);
-            _logger.Debug($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
+            _logger.Warn($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
             return InspectionsStatusCode.ProcessedWithErrors;
 
         }
@@ -132,9 +132,9 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         }
 
         private static void AddInspectionData(int ukprn, string url, DateTime datePublished,
-            OverallEffectiveness overallEffectiveness, ICollection<OfstedInspection> inspections)
+            OverallEffectiveness overallEffectiveness, ICollection<InspectionOutcome> inspections)
         {
-            var inspectionData = new OfstedInspection
+            var inspectionData = new InspectionOutcome
             {
                 Ukprn = ukprn,
                 Website = url,

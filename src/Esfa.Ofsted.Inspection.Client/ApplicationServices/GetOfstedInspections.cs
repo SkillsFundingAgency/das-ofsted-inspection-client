@@ -20,11 +20,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// <summary>
         /// GetOfstedInspections with default logging
         /// </summary>
-        public GetOfstedInspections() : this(new LogFunctions(),
-                                             new AngleSharpService(), 
-                                             new ConfigurationSettings(), 
-                                             new GetInspectionsService()
-                                            )
+        public GetOfstedInspections() : this(new LogFunctions())
         {}
 
         /// <summary>
@@ -34,10 +30,8 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             this(logger,
                 new AngleSharpService(),
                 new ConfigurationSettings(),
-                new GetInspectionsService(logger, 
-                                          new GetOfstedDetailsFromExcelPackageService(logger), 
-                                          new SystemWebClientFactory())
-        )
+                new GetInspectionsService(logger)
+                )
         {
             _logger = logger;
         }
@@ -55,7 +49,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// Returns a list of ofsted inspection details 
         /// </summary>
         /// <returns>A set of inspection details giving website, ukrpn, date ofsted results published, and effectiveness rating</returns>
-        public InspectionsDetail GetAll()
+        public InspectionOutcomesResponse GetAll()
         {
             _logger.Info("Start: gathering of Ofsted details");
              var getFirstMatchingLink = GetFirstMatchingLink();

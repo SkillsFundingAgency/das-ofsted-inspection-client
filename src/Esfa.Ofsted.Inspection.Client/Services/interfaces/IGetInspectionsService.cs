@@ -4,6 +4,6 @@ namespace Esfa.Ofsted.Inspection.Client.Services.Interfaces
 {
     internal interface IGetInspectionsService
     {
-        InspectionsDetail GetInspectionsDetail(string firstLinkUrl);
+        InspectionOutcomesResponse GetInspectionsDetail(string firstLinkUrl);
     }
 }

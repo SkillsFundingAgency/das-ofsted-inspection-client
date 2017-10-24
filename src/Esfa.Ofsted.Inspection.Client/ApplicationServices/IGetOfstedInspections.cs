@@ -9,9 +9,9 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
     public interface IGetOfstedInspections
     {
         /// <summary>
-        /// Get All Inspections
+        /// Get All InspectionOutcomes
         /// </summary>
         /// <returns></returns>
-        InspectionsDetail GetAll();
+        InspectionOutcomesResponse GetAll();
     }
 }

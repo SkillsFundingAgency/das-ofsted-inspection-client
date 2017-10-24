@@ -27,9 +27,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockGetInspectionsService = new Mock<IGetInspectionsService>();
 
-            var inspectionDetail = new InspectionsDetail { StatusCode = InspectionsStatusCode.Success,
-                                                           Inspections = new List<OfstedInspection> {new OfstedInspection()},
-                                                           ErrorSet = null};
+            var inspectionDetail = new InspectionOutcomesResponse { StatusCode = InspectionsStatusCode.Success,
+                                                           InspectionOutcomes = new List<InspectionOutcome> {new InspectionOutcome()},
+                                                           InspectionOutcomeErrors = null};
 
             var mockLogger = new Mock<ILogFunctions>();
 
@@ -54,9 +54,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.Verify(x => x.Debug, Times.Exactly(2));
 
             Assert.AreEqual(InspectionsStatusCode.Success, res.StatusCode, $"The expected status code was success, but actual was [{res.StatusCode}]");
-            Assert.IsNotNull(res.Inspections,$"The inspections should have some values, but was null");
-            Assert.AreEqual(1, res.Inspections.Count, $"The number of inpections expected as 1, but actual was [{res.Inspections.Count}]");
-            Assert.IsNull(res.ErrorSet, $"The Errorset expected was null, but actual was not null");
+            Assert.IsNotNull(res.InspectionOutcomes,$"The inspections should have some values, but was null");
+            Assert.AreEqual(1, res.InspectionOutcomes.Count, $"The number of inpections expected as 1, but actual was [{res.InspectionOutcomes.Count}]");
+            Assert.IsNull(res.InspectionOutcomeErrors, $"The Errorset expected was null, but actual was not null");
 
 
         }

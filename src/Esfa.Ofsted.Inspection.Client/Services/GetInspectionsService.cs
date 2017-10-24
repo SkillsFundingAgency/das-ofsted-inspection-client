@@ -15,9 +15,15 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private readonly ILogFunctions _logger;
         private readonly IWebClientFactory _webClientFactory;
 
-        public GetInspectionsService() : this(new LogFunctions(), new GetOfstedDetailsFromExcelPackageService(), new SystemWebClientFactory())
+        public GetInspectionsService() : this(new LogFunctions())
         { }
-        
+
+
+        public GetInspectionsService(ILogFunctions logger) : this(logger, new GetOfstedDetailsFromExcelPackageService(), new SystemWebClientFactory())
+        {
+            _logger = logger;
+        }
+
         public GetInspectionsService(ILogFunctions logger, IGetOfstedDetailsFromExcelPackageService getOfstedDetailsFromExcelPackageService, IWebClientFactory webClientFactory)
         {
             _logger = logger;
@@ -25,9 +31,9 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             _webClientFactory = webClientFactory;
         }
 
-        public InspectionsDetail GetInspectionsDetail(string firstLinkUrl)
+        public InspectionOutcomesResponse GetInspectionsDetail(string firstLinkUrl)
         {
-            InspectionsDetail inspectionsDetail;
+            InspectionOutcomesResponse inspectionOutcomesResponse;
             try
             {
                 _logger.Debug("Opening web client");
@@ -45,7 +51,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                         using (var package = new ExcelPackage(stream))
                         {
                             _logger.Debug("Opened excel package");
-                            inspectionsDetail = _getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(package);
+                            inspectionOutcomesResponse = _getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(package);
                         }
                         _logger.Debug("Closed excel package");
 
@@ -78,7 +84,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 throw exception;
             }
 
-            return inspectionsDetail;
+            return inspectionOutcomesResponse;
         }
     }
 }

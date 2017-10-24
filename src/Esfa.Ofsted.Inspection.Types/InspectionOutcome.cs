@@ -5,7 +5,7 @@ namespace Esfa.Ofsted.Inspection.Types
     /// <summary>
     /// Ofsted Inspection Details
     /// </summary>
-    public class OfstedInspection
+    public class InspectionOutcome
     {
         /// <summary>
         /// Website of provider

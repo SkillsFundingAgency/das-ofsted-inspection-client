@@ -7,12 +7,15 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
     [TestFixture, Explicit]
     public class IntegrationTestWithOverriddenLogger
     {
+        static bool? _processedWithLog;
 
         [Test]
         public void TestWithoutLogger()
         {
 
-            var resultWithoutLogger = new GetOfstedInspections().GetAll();
+            _processedWithLog = false;
+            new GetOfstedInspections().GetAll();
+            Assert.IsFalse(_processedWithLog);
         }
 
         [Test]
@@ -20,9 +23,10 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
         {
 
             var logger = new LocalLogger();
-            var resultWithLogger = new GetOfstedInspections(logger).GetAll();
-
-            Assert.IsTrue(true);
+ 
+            _processedWithLog = false;
+            new GetOfstedInspections(logger).GetAll();
+            Assert.IsTrue(_processedWithLog);
 
         }
 
@@ -30,10 +34,12 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
         {
             public Action<string> Debug { get; set; } = x =>
             {
+                _processedWithLog = true;
                 Console.WriteLine($@"Debugging: {x}");
             };
 
-            public Action<string> Info { get; set; } = x => Console.WriteLine(x); 
+            public Action<string> Info { get; set; } = x => Console.WriteLine(x);
+            public Action<string> Warn { get; set; } = x => Console.WriteLine(x);
             public Action<string, Exception> Error { get; set; } = (x, y) => Console.WriteLine($@"Error {x}, Exception Message: {y.Message}");
         }
 

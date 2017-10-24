@@ -1,7 +1,7 @@
 ﻿namespace Esfa.Ofsted.Inspection.Types
 {
     /// <summary>
-    /// Status Code for Inspections gathering
+    /// Status Code for InspectionOutcomes gathering
     /// </summary>
     public enum InspectionsStatusCode
     {

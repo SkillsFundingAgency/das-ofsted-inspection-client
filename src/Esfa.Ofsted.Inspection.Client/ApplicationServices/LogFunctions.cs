@@ -16,6 +16,10 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// </summary>
         public Action<string> Info { get; set; } = x => Console.WriteLine(x);
         /// <summary>
+        /// Action called for warning status logging
+        /// </summary>
+        public Action<string> Warn { get; set; } = x => Console.WriteLine(x);
+        /// <summary>
         /// Action called for Error status with Exception
         /// </summary>
         public Action<string, Exception> Error { get; set; } = (x, y) => Console.WriteLine(x);

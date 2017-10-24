@@ -48,14 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\InvalidLinkException.cs" />
-    <Compile Include="Exceptions\NoDetailsException.cs" />
+    <Compile Include="Exceptions\MissingInspectionOutcomesException.cs" />
     <Compile Include="Exceptions\NoLinksInPageException.cs" />
     <Compile Include="Exceptions\NoWorksheetPresentException.cs" />
     <Compile Include="Exceptions\UrlReadingException.cs" />
     <Compile Include="InspectionsStatusCode.cs" />
-    <Compile Include="OfstedInspection.cs" />
+    <Compile Include="InspectionOutcome.cs" />
     <Compile Include="InspectionError.cs" />
-    <Compile Include="InspectionsDetail.cs" />
+    <Compile Include="InspectionOutcomesResponse.cs" />
     <Compile Include="OverallEffectiveness.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

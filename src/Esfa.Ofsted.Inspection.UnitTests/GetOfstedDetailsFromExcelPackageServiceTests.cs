@@ -71,7 +71,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             CreateRow(excelWorksheet, 5, hyperlink, string.Empty, string.Empty, "abc");
             CreateRow(excelWorksheet, 6, "random", string.Empty, string.Empty, "zed");
 
-             Assert.Throws<NoDetailsException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
+             Assert.Throws<MissingInspectionOutcomesException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
             mockLogger.Verify(x => x.Error, Times.Exactly(1));
             Assert.IsTrue(errorMessageString.Equals("No details could be found when processing"), "Logged Error message does not contain expected words");
             Assert.IsNotNull(errorException);
@@ -111,9 +111,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
             mockLogger.Verify(x => x.Debug, Times.Exactly(2));
-            Assert.AreEqual(2, inspectionDetails.Inspections.Count, $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
+            Assert.AreEqual(2, inspectionDetails.InspectionOutcomes.Count, $"2 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
             Assert.AreEqual(InspectionsStatusCode.Success, inspectionDetails.StatusCode, "InspectionDetails status code was expected to be Success");
-            Assert.AreEqual(0, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 0");
+            Assert.AreEqual(0, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 0");
         }
 
         [Test]
@@ -149,6 +149,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var mockLogger = new Mock<ILogFunctions>();
             var action = new Action<string>(message => { });
             mockLogger.SetupGet(x => x.Debug).Returns(action);
+            mockLogger.SetupGet(x => x.Warn).Returns(action);
 
             var getOfstedDetailsFromExcelPackageService
                 = new GetOfstedDetailsFromExcelPackageService(mockLogger.Object, mockProcessExcelFormulaToLink.Object,
@@ -157,27 +158,28 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
 
-            mockLogger.Verify(x => x.Debug, Times.Exactly(6));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(2));
+            mockLogger.Verify(x => x.Warn, Times.Exactly(4));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, inspectionDetails.Inspections.Count,
-                    $"2 inspections were expected, but {inspectionDetails.Inspections.Count} was returned");
+                Assert.AreEqual(2, inspectionDetails.InspectionOutcomes.Count,
+                    $"2 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
-                Assert.AreEqual(4, inspectionDetails.ErrorSet.Count, "The Errorset was expected to be 4");
-                Assert.AreEqual("29/09/2017", inspectionDetails.ErrorSet[0].DatePublished);
-                Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[0].Ukprn);
-                Assert.AreEqual("4", inspectionDetails.ErrorSet[0].OverallEffectiveness);
-                Assert.AreEqual("10033442", inspectionDetails.ErrorSet[1].Ukprn);
-                Assert.AreEqual("date goes here", inspectionDetails.ErrorSet[1].DatePublished);
-                Assert.AreEqual("9", inspectionDetails.ErrorSet[1].OverallEffectiveness);
-                Assert.AreEqual("10033443", inspectionDetails.ErrorSet[2].Ukprn);
-                Assert.AreEqual("28/09/2017", inspectionDetails.ErrorSet[2].DatePublished);
-                Assert.AreEqual("x", inspectionDetails.ErrorSet[2].OverallEffectiveness);
-                Assert.AreEqual(string.Empty, inspectionDetails.ErrorSet[3].Ukprn);
-                Assert.AreEqual("date stuff", inspectionDetails.ErrorSet[3].DatePublished);
-                Assert.AreEqual("notvalid", inspectionDetails.ErrorSet[3].OverallEffectiveness);
+                Assert.AreEqual(4, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 4");
+                Assert.AreEqual("29/09/2017", inspectionDetails.InspectionOutcomeErrors[0].DatePublished);
+                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors[0].Ukprn);
+                Assert.AreEqual("4", inspectionDetails.InspectionOutcomeErrors[0].OverallEffectiveness);
+                Assert.AreEqual("10033442", inspectionDetails.InspectionOutcomeErrors[1].Ukprn);
+                Assert.AreEqual("date goes here", inspectionDetails.InspectionOutcomeErrors[1].DatePublished);
+                Assert.AreEqual("9", inspectionDetails.InspectionOutcomeErrors[1].OverallEffectiveness);
+                Assert.AreEqual("10033443", inspectionDetails.InspectionOutcomeErrors[2].Ukprn);
+                Assert.AreEqual("28/09/2017", inspectionDetails.InspectionOutcomeErrors[2].DatePublished);
+                Assert.AreEqual("x", inspectionDetails.InspectionOutcomeErrors[2].OverallEffectiveness);
+                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors[3].Ukprn);
+                Assert.AreEqual("date stuff", inspectionDetails.InspectionOutcomeErrors[3].DatePublished);
+                Assert.AreEqual("notvalid", inspectionDetails.InspectionOutcomeErrors[3].OverallEffectiveness);
             });
         }
 
@@ -208,6 +210,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var mockLogger = new Mock<ILogFunctions>();
             var action = new Action<string>(message => { });
             mockLogger.SetupGet(x => x.Debug).Returns(action);
+            mockLogger.SetupGet(x => x.Warn).Returns(action);
 
             var errorMessageString = string.Empty;
             Exception errorException = null;
@@ -223,8 +226,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 = new GetOfstedDetailsFromExcelPackageService(mockLogger.Object,mockProcessExcelFormulaToLink.Object,
                     mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
-            Assert.Throws<NoDetailsException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
-            mockLogger.Verify(x => x.Debug, Times.Exactly(3));
+            Assert.Throws<MissingInspectionOutcomesException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
+            mockLogger.Verify(x => x.Warn, Times.Exactly(3));
             mockLogger.Verify(x => x.Error, Times.Exactly(1));
             Assert.IsTrue(errorMessageString.Equals("No inspections were processed successfully"), "Logged Error message does not contain expected words");
             Assert.IsNotNull(errorException);
