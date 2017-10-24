@@ -14,16 +14,16 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private readonly ILogFunctions _logger;
         private readonly IWebClientFactory _webClientFactory;
 
-        public GetInspectionsService() : this(new LogFunctions())
+        internal GetInspectionsService() : this(new LogFunctions())
         { }
 
 
-        public GetInspectionsService(ILogFunctions logger) : this(logger, new GetOfstedDetailsFromExcelPackageService(logger), new SystemWebClientFactory())
+        internal GetInspectionsService(ILogFunctions logger) : this(logger, new GetOfstedDetailsFromExcelPackageService(logger), new SystemWebClientFactory())
         {
             _logger = logger;
         }
 
-        public GetInspectionsService(ILogFunctions logger, IGetOfstedDetailsFromExcelPackageService getOfstedDetailsFromExcelPackageService, IWebClientFactory webClientFactory)
+        internal GetInspectionsService(ILogFunctions logger, IGetOfstedDetailsFromExcelPackageService getOfstedDetailsFromExcelPackageService, IWebClientFactory webClientFactory)
         {
             _logger = logger;
             _getOfstedDetailsFromExcelPackageService = getOfstedDetailsFromExcelPackageService;

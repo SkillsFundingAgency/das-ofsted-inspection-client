@@ -20,19 +20,19 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private readonly IConfigurationSettings _configurationSettings;
         private readonly ILogFunctions _logger;
 
-        public GetOfstedDetailsFromExcelPackageService(ILogFunctions logger) : this(logger,
+        internal GetOfstedDetailsFromExcelPackageService(ILogFunctions logger) : this(logger,
             new ProcessExcelFormulaToLink(),
             new OverallEffectivenessProcessor(),
             new ConfigurationSettings())
         {}
 
-        public GetOfstedDetailsFromExcelPackageService() : this(new LogFunctions(),
+        internal GetOfstedDetailsFromExcelPackageService() : this(new LogFunctions(),
                                                                 new ProcessExcelFormulaToLink(),
                                                                 new OverallEffectivenessProcessor(),
                                                                 new ConfigurationSettings())
         {}
 
-        public GetOfstedDetailsFromExcelPackageService( ILogFunctions logger,
+        internal GetOfstedDetailsFromExcelPackageService( ILogFunctions logger,
                                                         IProcessExcelFormulaToLink processExcelFormulaToLink, 
                                                         IOverallEffectivenessProcessor overallEffectivenessProcessor,
                                                         IConfigurationSettings configurationSettings)
@@ -115,9 +115,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return InspectionsStatusCode.ProcessedWithErrors;
 
         }
-
-       
-
+ 
         private static int FindStartingLineNumber(ExcelWorksheet keyWorksheet)
         {
             var lineNumberStart = keyWorksheet.Dimension.Start.Row;
@@ -171,7 +169,6 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 
             return null;
         }
-
 
         private static DateTime? GetDateTimeValue(ExcelRange excelRange)
         {

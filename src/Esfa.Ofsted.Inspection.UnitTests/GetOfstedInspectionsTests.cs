@@ -41,13 +41,13 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             mockGetInspectionsService.Setup(x => x.GetInspectionsDetail(It.IsAny<string>())).Returns(inspectionDetail);
 
-            var getOfstedInspections =
-                new OfstedInspectionsClientClient(mockLogger.Object,
+            var ofstedInspectionsClient =
+                new OfstedInspectionsClient(mockLogger.Object,
                                          mockAngleSharpService.Object,
                                          mockConfigurationSettings.Object,
                                          mockGetInspectionsService.Object);
 
-            var res = getOfstedInspections.GetOfstedInspectionOutcomes();
+            var res = ofstedInspectionsClient.GetOfstedInspectionOutcomes();
 
             mockLogger.VerifyAll();
             mockLogger.Verify(x => x.Info, Times.Exactly(2));
@@ -90,7 +90,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.SetupGet(x => x.Debug).Returns(action);
 
             var getOfstedInspections =
-                new OfstedInspectionsClientClient(
+                new OfstedInspectionsClient(
                     mockLogger.Object,
                     mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,
@@ -133,7 +133,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.SetupGet(x => x.Debug).Returns(action);
 
             var getOfstedInspections =
-                new OfstedInspectionsClientClient(
+                new OfstedInspectionsClient(
                     mockLogger.Object,
                     mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,

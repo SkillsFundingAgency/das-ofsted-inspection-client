@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OfstedInspectionsClientClient.cs" />
+    <Compile Include="OfstedInspectionsClient.cs" />
     <Compile Include="IOfstedInspectionsClient.cs" />
     <Compile Include="ILogFunctions.cs" />
     <Compile Include="LogFunctions.cs" />

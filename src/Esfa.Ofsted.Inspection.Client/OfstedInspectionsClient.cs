@@ -10,7 +10,7 @@ namespace Esfa.Ofsted.Inspection.Client
     /// <summary>
     /// Get Latest Ofsted Inspection details available
     /// </summary>
-    public class OfstedInspectionsClientClient : IOfstedInspectionsClient
+    public class OfstedInspectionsClient : IOfstedInspectionsClient
     {
         private readonly IGetInspectionsService _getInspectionsService;
         private readonly IAngleSharpService _angleSharpService;
@@ -18,15 +18,15 @@ namespace Esfa.Ofsted.Inspection.Client
         private readonly ILogFunctions _logger;
 
         /// <summary>
-        /// OfstedInspectionsClientClient with default logging
+        /// OfstedInspectionsClient with default logging
         /// </summary>
-        public OfstedInspectionsClientClient() : this(new LogFunctions())
+        public OfstedInspectionsClient() : this(new LogFunctions())
         {}
 
         /// <summary>
-        /// OfstedInspectionsClientClient with logging overrides available
+        /// OfstedInspectionsClient with logging overrides available
         /// </summary>
-        public OfstedInspectionsClientClient(ILogFunctions logger) : 
+        public OfstedInspectionsClient(ILogFunctions logger) : 
             this(logger,
                 new AngleSharpService(),
                 new ConfigurationSettings(),
@@ -36,7 +36,7 @@ namespace Esfa.Ofsted.Inspection.Client
             _logger = logger;
         }
 
-        internal OfstedInspectionsClientClient(ILogFunctions logger, IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
+        internal OfstedInspectionsClient(ILogFunctions logger, IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
         {
             _angleSharpService = angleSharpService;
             _configurationSettings = configurationSettings;
