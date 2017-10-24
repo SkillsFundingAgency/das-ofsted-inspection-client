@@ -19,7 +19,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         { }
 
 
-        public GetInspectionsService(ILogFunctions logger) : this(logger, new GetOfstedDetailsFromExcelPackageService(), new SystemWebClientFactory())
+        public GetInspectionsService(ILogFunctions logger) : this(logger, new GetOfstedDetailsFromExcelPackageService(logger), new SystemWebClientFactory())
         {
             _logger = logger;
         }
