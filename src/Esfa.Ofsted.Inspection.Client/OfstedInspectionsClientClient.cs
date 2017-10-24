@@ -5,12 +5,12 @@ using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
 using Esfa.Ofsted.Inspection.Types.Exceptions;
 
-namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
+namespace Esfa.Ofsted.Inspection.Client
 {
     /// <summary>
     /// Get Latest Ofsted Inspection details available
     /// </summary>
-    public class GetOfstedInspections : IGetOfstedInspections
+    public class OfstedInspectionsClientClient : IOfstedInspectionsClient
     {
         private readonly IGetInspectionsService _getInspectionsService;
         private readonly IAngleSharpService _angleSharpService;
@@ -18,15 +18,15 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         private readonly ILogFunctions _logger;
 
         /// <summary>
-        /// GetOfstedInspections with default logging
+        /// OfstedInspectionsClientClient with default logging
         /// </summary>
-        public GetOfstedInspections() : this(new LogFunctions())
+        public OfstedInspectionsClientClient() : this(new LogFunctions())
         {}
 
         /// <summary>
-        /// GetOfstedInspections with logging overrides available
+        /// OfstedInspectionsClientClient with logging overrides available
         /// </summary>
-        public GetOfstedInspections(ILogFunctions logger) : 
+        public OfstedInspectionsClientClient(ILogFunctions logger) : 
             this(logger,
                 new AngleSharpService(),
                 new ConfigurationSettings(),
@@ -36,7 +36,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
             _logger = logger;
         }
 
-        internal GetOfstedInspections(ILogFunctions logger, IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
+        internal OfstedInspectionsClientClient(ILogFunctions logger, IAngleSharpService angleSharpService, IConfigurationSettings configurationSettings,IGetInspectionsService getInspectionsService)
         {
             _angleSharpService = angleSharpService;
             _configurationSettings = configurationSettings;
@@ -49,7 +49,7 @@ namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
         /// Returns a list of ofsted inspection details 
         /// </summary>
         /// <returns>A set of inspection details giving website, ukrpn, date ofsted results published, and effectiveness rating</returns>
-        public InspectionOutcomesResponse GetAll()
+        public InspectionOutcomesResponse GetOfstedInspectionOutcomes()
         {
             _logger.Info("Start: gathering of Ofsted details");
              var getFirstMatchingLink = GetFirstMatchingLink();

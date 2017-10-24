@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;
@@ -42,12 +42,12 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockGetInspectionsService.Setup(x => x.GetInspectionsDetail(It.IsAny<string>())).Returns(inspectionDetail);
 
             var getOfstedInspections =
-                new GetOfstedInspections(mockLogger.Object,
+                new OfstedInspectionsClientClient(mockLogger.Object,
                                          mockAngleSharpService.Object,
                                          mockConfigurationSettings.Object,
                                          mockGetInspectionsService.Object);
 
-            var res = getOfstedInspections.GetAll();
+            var res = getOfstedInspections.GetOfstedInspectionOutcomes();
 
             mockLogger.VerifyAll();
             mockLogger.Verify(x => x.Info, Times.Exactly(2));
@@ -90,7 +90,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.SetupGet(x => x.Debug).Returns(action);
 
             var getOfstedInspections =
-                new GetOfstedInspections(
+                new OfstedInspectionsClientClient(
                     mockLogger.Object,
                     mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,
@@ -98,7 +98,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                 );
 
            
-            Assert.Throws<NoLinksInPageException>(() => getOfstedInspections.GetAll());
+            Assert.Throws<NoLinksInPageException>(() => getOfstedInspections.GetOfstedInspectionOutcomes());
             mockLogger.Verify(x => x.Info, Times.Exactly(1));
             mockLogger.Verify(x => x.Debug, Times.Exactly(0));
             Assert.IsTrue(errorMessageString.StartsWith("Could not locate any links in page ["), "Logged Error message does not contain expected words");
@@ -133,14 +133,14 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             mockLogger.SetupGet(x => x.Debug).Returns(action);
 
             var getOfstedInspections =
-                new GetOfstedInspections(
+                new OfstedInspectionsClientClient(
                     mockLogger.Object,
                     mockAngleSharpService.Object,
                     mockConfigurationSettings.Object,
                     mockGetInspectionsService.Object
                 );
    
-            Assert.Throws<InvalidLinkException>(() => getOfstedInspections.GetAll());
+            Assert.Throws<InvalidLinkException>(() => getOfstedInspections.GetOfstedInspectionOutcomes());
             mockLogger.Verify(x => x.Info, Times.Exactly(1));
             mockLogger.Verify(x => x.Debug, Times.Exactly(1));
             Assert.IsTrue(errorMessageString.StartsWith("Could not build a valid url from url ["), "Logged Error message does not contain expected words");

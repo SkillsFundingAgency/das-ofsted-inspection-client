@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Esfa.Ofsted.Inspection.Client.ApplicationServices
+namespace Esfa.Ofsted.Inspection.Client
 {
     /// <summary>
     /// Logging Functions that can be overridden

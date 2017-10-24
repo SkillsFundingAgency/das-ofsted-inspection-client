@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using Esfa.Ofsted.Inspection.Types;

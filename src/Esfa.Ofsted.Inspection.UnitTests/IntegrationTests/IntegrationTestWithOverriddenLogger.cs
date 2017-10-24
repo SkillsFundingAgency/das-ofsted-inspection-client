@@ -1,5 +1,5 @@
 ﻿using System;
-using Esfa.Ofsted.Inspection.Client.ApplicationServices;
+using Esfa.Ofsted.Inspection.Client;
 using NUnit.Framework;
 
 namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
@@ -14,7 +14,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
         {
 
             _processedWithLog = false;
-            new GetOfstedInspections().GetAll();
+            new OfstedInspectionsClientClient().GetOfstedInspectionOutcomes();
             Assert.IsFalse(_processedWithLog);
         }
 
@@ -25,7 +25,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
             var logger = new LocalLogger();
  
             _processedWithLog = false;
-            new GetOfstedInspections(logger).GetAll();
+            new OfstedInspectionsClientClient(logger).GetOfstedInspectionOutcomes();
             Assert.IsTrue(_processedWithLog);
 
         }

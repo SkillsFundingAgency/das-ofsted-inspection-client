@@ -14,7 +14,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         {
         }
 
-        public AngleSharpService(IHttpGet httpGet)
+        internal AngleSharpService(IHttpGet httpGet)
         {
             _httpGet = httpGet;
         }
