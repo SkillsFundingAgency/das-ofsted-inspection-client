@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sfa.Das.Ofsted.InspectionOutcome.Types")]
+[assembly: AssemblyTitle("Esfa.Ofsted.InspectionOutcome.Types")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sfa.Das.Ofsted.InspectionOutcome.Types")]
+[assembly: AssemblyProduct("Esfa.Ofsted.InspectionOutcome.Types")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
