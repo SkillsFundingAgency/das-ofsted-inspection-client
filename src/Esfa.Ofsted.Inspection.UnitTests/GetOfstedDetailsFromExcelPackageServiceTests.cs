@@ -131,6 +131,10 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
             CreateRow(excelWorksheet, 9, "random", "10033443", new DateTime(2017, 09, 28), "x");
             CreateRow(excelWorksheet, 10, "random", "", "date stuff", "notvalid");
+            CreateRow(excelWorksheet, 11, "random", "10033442", "NULL", "9");
+            CreateRow(excelWorksheet, 12, "random", "10033442", "null", "9");
+            CreateRow(excelWorksheet, 13, "random", "10033442", "Null", "9");
+
 
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
@@ -158,13 +162,13 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
 
-            mockLogger.Verify(x => x.Debug, Times.Exactly(2));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(5));
             mockLogger.Verify(x => x.Warn, Times.Exactly(4));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, inspectionDetails.InspectionOutcomes.Count,
-                    $"2 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
+                Assert.AreEqual(5, inspectionDetails.InspectionOutcomes.Count,
+                    $"5 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
                 Assert.AreEqual(4, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 4");

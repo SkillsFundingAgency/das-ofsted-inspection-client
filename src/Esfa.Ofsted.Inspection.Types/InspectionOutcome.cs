@@ -18,7 +18,7 @@ namespace Esfa.Ofsted.Inspection.Types
         /// <summary>
         /// Date of Report Publication
         /// </summary>
-        public DateTime DatePublished { get; set; }
+        public DateTime? DatePublished { get; set; }
         /// <summary>
         /// Overall Effectiveness Status
         /// </summary>

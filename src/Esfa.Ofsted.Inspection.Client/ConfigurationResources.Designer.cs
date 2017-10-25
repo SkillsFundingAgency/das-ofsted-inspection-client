@@ -79,7 +79,7 @@ namespace Esfa.Ofsted.Inspection.Client {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to D1 In-year inspection data.
+        ///   Looks up a localized string similar to D2 Most recent inspection data.
         /// </summary>
         internal static string WorksheetName {
             get {

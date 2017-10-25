@@ -13,8 +13,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [TestCase("4", OverallEffectiveness.Inadequate)]
         [TestCase("9", OverallEffectiveness.RemainedGoodAtAShortInspectionThatDidNotConvert)]
         [TestCase("-", OverallEffectiveness.NotJudged)]
-        [TestCase(null, OverallEffectiveness.NotJudged)]
-       
+        [TestCase("NULL", OverallEffectiveness.NotJudged)]
+        [TestCase("null", OverallEffectiveness.NotJudged)]
         public void ShouldReturnStringModifiedForUrlUsage(string inputText, OverallEffectiveness expectedEffectiveness)
         {
             var actual = new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);
@@ -26,6 +26,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [TestCase("22")]
         [TestCase("--")]
         [TestCase("01")]
+        [TestCase(null)]
         public void ShouldReturnExceptionForOddEffectivenessValues(string inputText)
         {
 

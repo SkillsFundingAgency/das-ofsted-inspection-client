@@ -100,18 +100,22 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[lineNumber, WebLinkPosition].Formula, keyWorksheet.Cells[lineNumber, WebLinkPosition].Text);
             var overallEffectiveness = ProcessOverallEffectivenessForError(Convert.ToString(keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value), error);
             var datePublished = ProcessDatePublishedForError(keyWorksheet.Cells[lineNumber, DatePublishedPosition], error);
+            var datePublishedString = datePublished?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+            if (keyWorksheet.Cells[lineNumber, DatePublishedPosition]?.Value.ToString().ToLower() == "null")
+                datePublishedString = "NULL";
 
-            if (ukprn != null && overallEffectiveness != null && datePublished != null)
+
+            if (ukprn != null && overallEffectiveness != null && datePublishedString != null)
             {
-                AddInspectionData((int) ukprn, url, (DateTime) datePublished, (OverallEffectiveness) overallEffectiveness,
+                AddInspectionData((int) ukprn, url, datePublished, (OverallEffectiveness) overallEffectiveness,
                     inspections);
-                _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {datePublished}, {overallEffectiveness}");
+                _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {datePublishedString}, {overallEffectiveness}");
                 return InspectionsStatusCode.Success;
             }
 
             error.Website = url;
             errorSet.Add(error);
-            _logger.Warn($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
+            _logger.Warn($"Details processed unsuccessfully for line {error.LineNumber}: '{error.LineNumber}', '{error.Website}', '{error.DatePublished}', '{error.OverallEffectiveness}'");
             return InspectionsStatusCode.ProcessedWithErrors;
 
         }
@@ -128,7 +132,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return lineNumberStart > keyWorksheet.Dimension.End.Row ? 0 : lineNumberStart;
         }
 
-        private static void AddInspectionData(int ukprn, string url, DateTime datePublished,
+        private static void AddInspectionData(int ukprn, string url, DateTime? datePublished,
             OverallEffectiveness overallEffectiveness, ICollection<InspectionOutcome> inspections)
         {
             var inspectionData = new InspectionOutcome
