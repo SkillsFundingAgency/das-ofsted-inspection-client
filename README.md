@@ -15,10 +15,10 @@ provides a client that returns a list of latest OFSTED report scores, publicatio
 returns the following details
 
 ``` csharp
-public class InspectionsDetail
+    public class InspectionOutcomesResponse
     {
-        Inspections, // one or more inspection details  (Website,Ukprn,DatePublished,OverallEffectiveness)
-        ErrorSet, // zero or more errors (Website,Ukprn,DatePublished,OverallEffectiveness, lineNumber, Message)
+        InspectionOutcomes // one or more inspection outcomes (Website,Ukprn,DatePublished,OverallEffectiveness)
+        InspectionOutcomeErrors  // zero or more errors (Website,Ukprn,DatePublished,OverallEffectiveness, lineNumber, Message)
         StatusCode // 'Success', ' ProcessedWithErrors'
     }
 ```
