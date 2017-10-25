@@ -14,8 +14,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
         {
 
             _processedWithLog = false;
-            new OfstedInspectionsClient().GetOfstedInspectionOutcomes();
+            var x = new OfstedInspectionsClient().GetOfstedInspectionOutcomes();
             Assert.IsFalse(_processedWithLog);
+            Assert.AreEqual(0, x.InspectionOutcomeErrors.Count);
         }
 
         [Test]
@@ -25,8 +26,9 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
             var logger = new LocalLogger();
  
             _processedWithLog = false;
-            new OfstedInspectionsClient(logger).GetOfstedInspectionOutcomes();
+            var y = new OfstedInspectionsClient(logger).GetOfstedInspectionOutcomes();
             Assert.IsTrue(_processedWithLog);
+            Assert.AreEqual(0, y.InspectionOutcomeErrors.Count);
 
         }
 
