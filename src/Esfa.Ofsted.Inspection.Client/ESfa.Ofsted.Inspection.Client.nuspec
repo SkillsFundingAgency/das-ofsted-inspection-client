@@ -4,12 +4,12 @@
     <id>Esfa.Ofsted.Inspection.Client</id>
     <version>$version$</version>
     <title>Ofsted Inspection Client</title>
-    <authors>scottcowan</authors>
-    <owners>scottcowan</owners>
+    <authors>scottcowan markfcain</authors>
+    <owners>scottcowan sfanuget markfcain</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
     <projectUrl>https://github.com/SkillsFundingAgency/das-ofsted-inspection-client</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Returns Ofsted inspection information</description>
+    <description>Returns in-year and most recent Ofsted inspection Outcomes from management information available in [https://www.gov.uk/government/statistical-data-sets/monthly-management-information-ofsteds-further-education-and-skills-inspections-outcomes-from-december-2015]</description>
     <summary>Ofsted Inspection Client</summary>
     <tags>Ofsted Inspection</tags>
     <language>en-GB</language>

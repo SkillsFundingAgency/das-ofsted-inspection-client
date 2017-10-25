@@ -15,7 +15,6 @@
     <language>en-GB</language>
     <dependencies>
       <group targetFramework=".NETFramework4.5.2">
-        <dependency id="EPPlus" version="4.1.1" />
       </group>
     </dependencies>
   </metadata>
