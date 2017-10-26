@@ -155,7 +155,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 }
             else
                 {
-                error.DatePublished = cell.Value.ToString();
+                error.DatePublished = cell.Text.ToString();
                 error.Message = error.Message + $@"Invalid value for Date Published [{error.DatePublished}]; ";
                 }
         

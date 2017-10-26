@@ -135,6 +135,8 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             CreateRow(excelWorksheet, 11, "random", "10033442", "NULL", "9");
             CreateRow(excelWorksheet, 12, "random", "10033442", "null", "9");
             CreateRow(excelWorksheet, 13, "random", "10033442", "Null", "9");
+            CreateRow(excelWorksheet, 14, "random", "10033443", null, "9");
+            CreateRow(excelWorksheet, 15, "random", "10033444", "", "9");
 
 
 
@@ -164,7 +166,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
 
             mockLogger.Verify(x => x.Debug, Times.Exactly(5));
-            mockLogger.Verify(x => x.Warn, Times.Exactly(4));
+            mockLogger.Verify(x => x.Warn, Times.Exactly(6));
 
             Assert.Multiple(() =>
             {
@@ -172,7 +174,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                     $"5 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
-                Assert.AreEqual(4, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 4");
+                Assert.AreEqual(6, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 6");
                 Assert.AreEqual("29/09/2017", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).DatePublished);
                 Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).Ukprn);
                 Assert.AreEqual("4", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).OverallEffectiveness);
