@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Esfa.Ofsted.Inspection.Client;
 using Esfa.Ofsted.Inspection.Client.Services;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
@@ -131,6 +132,12 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
             CreateRow(excelWorksheet, 9, "random", "10033443", new DateTime(2017, 09, 28), "x");
             CreateRow(excelWorksheet, 10, "random", "", "date stuff", "notvalid");
+            CreateRow(excelWorksheet, 11, "random", "10033442", "NULL", "9");
+            CreateRow(excelWorksheet, 12, "random", "10033442", "null", "9");
+            CreateRow(excelWorksheet, 13, "random", "10033442", "Null", "9");
+            CreateRow(excelWorksheet, 14, "random", "10033443", null, "9");
+            CreateRow(excelWorksheet, 15, "random", "10033444", "", "9");
+
 
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
@@ -158,28 +165,30 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var inspectionDetails = getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage);
 
 
-            mockLogger.Verify(x => x.Debug, Times.Exactly(2));
-            mockLogger.Verify(x => x.Warn, Times.Exactly(4));
+            mockLogger.Verify(x => x.Debug, Times.Exactly(5));
+            mockLogger.Verify(x => x.Warn, Times.Exactly(6));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, inspectionDetails.InspectionOutcomes.Count,
-                    $"2 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
+                Assert.AreEqual(5, inspectionDetails.InspectionOutcomes.Count,
+                    $"5 inspections were expected, but {inspectionDetails.InspectionOutcomes.Count} was returned");
                 Assert.AreEqual(InspectionsStatusCode.ProcessedWithErrors, inspectionDetails.StatusCode,
                     "InspectionDetails status code was expected to be Processed with errors");
-                Assert.AreEqual(4, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 4");
-                Assert.AreEqual("29/09/2017", inspectionDetails.InspectionOutcomeErrors[0].DatePublished);
-                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors[0].Ukprn);
-                Assert.AreEqual("4", inspectionDetails.InspectionOutcomeErrors[0].OverallEffectiveness);
-                Assert.AreEqual("10033442", inspectionDetails.InspectionOutcomeErrors[1].Ukprn);
-                Assert.AreEqual("date goes here", inspectionDetails.InspectionOutcomeErrors[1].DatePublished);
-                Assert.AreEqual("9", inspectionDetails.InspectionOutcomeErrors[1].OverallEffectiveness);
-                Assert.AreEqual("10033443", inspectionDetails.InspectionOutcomeErrors[2].Ukprn);
-                Assert.AreEqual("28/09/2017", inspectionDetails.InspectionOutcomeErrors[2].DatePublished);
-                Assert.AreEqual("x", inspectionDetails.InspectionOutcomeErrors[2].OverallEffectiveness);
-                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors[3].Ukprn);
-                Assert.AreEqual("date stuff", inspectionDetails.InspectionOutcomeErrors[3].DatePublished);
-                Assert.AreEqual("notvalid", inspectionDetails.InspectionOutcomeErrors[3].OverallEffectiveness);
+                Assert.AreEqual(6, inspectionDetails.InspectionOutcomeErrors.Count, "The Errorset was expected to be 6");
+                Assert.AreEqual("29/09/2017", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).DatePublished);
+                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).Ukprn);
+                Assert.AreEqual("4", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 7).OverallEffectiveness);
+                Assert.AreEqual("10033442", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 8).Ukprn);
+                Assert.AreEqual("date goes here", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 8).DatePublished);
+                Assert.AreEqual("9", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber ==8).OverallEffectiveness);
+                Assert.AreEqual("10033443", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 9).Ukprn);
+                Assert.AreEqual("28/09/2017", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 9).DatePublished);
+                Assert.AreEqual("x", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 9).OverallEffectiveness);
+                Assert.AreEqual(string.Empty, inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 10).Ukprn);
+                Assert.AreEqual("date stuff", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 10).DatePublished);
+                Assert.AreEqual("notvalid", inspectionDetails.InspectionOutcomeErrors.Single(x => x.LineNumber == 10).OverallEffectiveness);
+                Assert.AreEqual("Invalid value for ukprn []; Invalid value for Overall Effectiveness [notvalid]; Invalid value for Date Published [date stuff]; ", inspectionDetails.InspectionOutcomeErrors.Single(x=>x.LineNumber == 10).Message);
+
             });
         }
 

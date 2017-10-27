@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using Esfa.Ofsted.Inspection.Client.Extensions;
 using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 using OfficeOpenXml;
 using Esfa.Ofsted.Inspection.Types;
@@ -99,23 +99,25 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var ukprn = ProcessUkprnForError(Convert.ToString(keyWorksheet.Cells[lineNumber, UkprnPosition].Value), error);
             var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[lineNumber, WebLinkPosition].Formula, keyWorksheet.Cells[lineNumber, WebLinkPosition].Text);
             var overallEffectiveness = ProcessOverallEffectivenessForError(Convert.ToString(keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value), error);
+
             var datePublished = ProcessDatePublishedForError(keyWorksheet.Cells[lineNumber, DatePublishedPosition], error);
 
             if (ukprn != null && overallEffectiveness != null && datePublished != null)
             {
-                AddInspectionData((int) ukprn, url, (DateTime) datePublished, (OverallEffectiveness) overallEffectiveness,
+                AddInspectionData((int) ukprn, url, datePublished, (OverallEffectiveness) overallEffectiveness,
                     inspections);
-                _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {datePublished}, {overallEffectiveness}");
+                _logger.Debug($"Details processed successfully for line {lineNumber}: {ukprn}, {url}, {error.DatePublished}, {overallEffectiveness}");
                 return InspectionsStatusCode.Success;
             }
 
             error.Website = url;
             errorSet.Add(error);
-            _logger.Warn($"Details processed unsuccessfully for line {lineNumber}: '{ukprn}', '{url}', '{datePublished}', '{overallEffectiveness}'");
+            _logger.Warn($"Details processed unsuccessfully for line {error.LineNumber}: '{error.LineNumber}', '{error.Website}', '{error.DatePublished}', '{error.OverallEffectiveness}'");
             return InspectionsStatusCode.ProcessedWithErrors;
 
         }
- 
+
+
         private static int FindStartingLineNumber(ExcelWorksheet keyWorksheet)
         {
             var lineNumberStart = keyWorksheet.Dimension.Start.Row;
@@ -128,14 +130,14 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return lineNumberStart > keyWorksheet.Dimension.End.Row ? 0 : lineNumberStart;
         }
 
-        private static void AddInspectionData(int ukprn, string url, DateTime datePublished,
+        private static void AddInspectionData(int ukprn, string url, DateTime? datePublished,
             OverallEffectiveness overallEffectiveness, ICollection<InspectionOutcome> inspections)
         {
             var inspectionData = new InspectionOutcome
             {
                 Ukprn = ukprn,
                 Website = url,
-                DatePublished = datePublished,
+                DatePublished = datePublished == DateTime.MinValue ? null : datePublished,
                 OverallEffectiveness =  overallEffectiveness
             };
 
@@ -145,11 +147,19 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private static DateTime? ProcessDatePublishedForError(ExcelRange cell,
             InspectionError error)
         {
-            
+
             var datePublished = GetDateTimeValue(cell);
-            error.DatePublished = datePublished?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) 
-                                  ?? cell.Value.ToString();
-            return datePublished;
+            if (datePublished != null)
+                {
+                error.DatePublished = datePublished == DateTime.MinValue ? "NULL" : datePublished.ToDdmmyyyyString();
+                }
+            else
+            {
+                error.DatePublished = cell.Text;
+                error.Message = error.Message + $@"Invalid value for Date Published [{error.DatePublished}]; ";
+            }
+        
+        return datePublished;
         }
 
         private OverallEffectiveness? ProcessOverallEffectivenessForError(string value, InspectionError error)
@@ -157,6 +167,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var overallEffectivenessString = value;
             var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
             error.OverallEffectiveness = overallEffectivenessString;
+            if (overallEffectiveness == null)
+            {
+                error.Message = error.Message + $@"Invalid value for Overall Effectiveness [{ error.OverallEffectiveness}]; ";
+            }
             return overallEffectiveness;
         }
 
@@ -167,12 +181,20 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             int ukprn;
             if (int.TryParse(ukprnString, out ukprn)) return ukprn;
 
+            error.Message = error.Message + $@"Invalid value for ukprn [{error.Ukprn = ukprnString}]; ";
             return null;
         }
 
         private static DateTime? GetDateTimeValue(ExcelRange excelRange)
         {
             var value = excelRange?.Value;
+            var valueToCheck = value as string;
+
+            if (valueToCheck == "null" || valueToCheck == "NULL"|| valueToCheck == "Null")
+            {
+                return DateTime.MinValue;
+            }
+                     
             return value as DateTime?;
         }
     }
