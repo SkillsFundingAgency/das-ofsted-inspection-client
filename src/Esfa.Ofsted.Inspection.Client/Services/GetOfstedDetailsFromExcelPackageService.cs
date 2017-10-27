@@ -154,10 +154,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 error.DatePublished = datePublished == DateTime.MinValue ? "NULL" : datePublished.ToDdmmyyyyString();
                 }
             else
-                {
-                error.DatePublished = cell.Text.ToString();
+            {
+                error.DatePublished = cell.Text;
                 error.Message = error.Message + $@"Invalid value for Date Published [{error.DatePublished}]; ";
-                }
+            }
         
         return datePublished;
         }
@@ -167,8 +167,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var overallEffectivenessString = value;
             var overallEffectiveness = _overallEffectivenessProcessor.GetOverallEffectiveness(overallEffectivenessString);
             error.OverallEffectiveness = overallEffectivenessString;
-            if (overallEffectiveness==null)
+            if (overallEffectiveness == null)
+            {
                 error.Message = error.Message + $@"Invalid value for Overall Effectiveness [{ error.OverallEffectiveness}]; ";
+            }
             return overallEffectiveness;
         }
 
