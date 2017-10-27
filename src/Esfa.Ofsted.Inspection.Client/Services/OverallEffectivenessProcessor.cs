@@ -22,6 +22,7 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 case "-":
                 case "NULL":
                 case "null":
+                case "Null":
                     return OverallEffectiveness.NotJudged;
                 default:
                     return null;

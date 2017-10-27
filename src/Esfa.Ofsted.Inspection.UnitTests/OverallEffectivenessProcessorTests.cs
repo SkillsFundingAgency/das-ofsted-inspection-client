@@ -15,6 +15,7 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         [TestCase("-", OverallEffectiveness.NotJudged)]
         [TestCase("NULL", OverallEffectiveness.NotJudged)]
         [TestCase("null", OverallEffectiveness.NotJudged)]
+        [TestCase("Null", OverallEffectiveness.NotJudged)]
         public void ShouldReturnStringModifiedForUrlUsage(string inputText, OverallEffectiveness expectedEffectiveness)
         {
             var actual = new OverallEffectivenessProcessor().GetOverallEffectiveness(inputText);
