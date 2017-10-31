@@ -11,14 +11,12 @@ namespace Esfa.Ofsted.Inspection.Client.Services
 {
     internal class GetOfstedDetailsFromExcelPackageService : IGetOfstedDetailsFromExcelPackageService
     {
-        private const int WebLinkPosition = 1;
-        private const int UkprnPosition = 3;
-        private const int DatePublishedPosition = 16;
-        private const int OverallEffectivenessPosition = 17;
+      
         private readonly IProcessExcelFormulaToLink _processExcelFormulaToLink;
         private readonly IOverallEffectivenessProcessor _overallEffectivenessProcessor;
         private readonly IConfigurationSettings _configurationSettings;
         private readonly ILogFunctions _logger;
+        
 
         internal GetOfstedDetailsFromExcelPackageService(ILogFunctions logger) : this(logger,
             new ProcessExcelFormulaToLink(),
@@ -58,9 +56,14 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 throw exception;
             }
 
-            var lineNumberStart = FindStartingLineNumber(keyWorksheet);
+            var spreadsheetDetails = GetSpreadsheetColumnAndRowDetails(keyWorksheet);
+           
 
-            if (lineNumberStart == 0)
+            if (spreadsheetDetails.WebLinkColumn== 0
+                || spreadsheetDetails.UkPrnColumn == 0
+                || spreadsheetDetails.DatePublishedColumn == 0
+                || spreadsheetDetails.OverallEffectivenessColumn == 0
+                || spreadsheetDetails.DataStartsRow == 0)
             {
                 const string message = "No details could be found when processing";
                 var exception = new MissingInspectionOutcomesException(message);  
@@ -68,9 +71,10 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 throw exception;
             }
 
-            for (var lineNumber = lineNumberStart; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
+            for (var lineNumber = spreadsheetDetails.DataStartsRow; lineNumber <= keyWorksheet.Dimension.End.Row; lineNumber++)
             {
-                var returnedStatusCode = ProcessLineIntoDetailsAsDetailOrError(keyWorksheet, lineNumber, inspections, errorSet);
+                var returnedStatusCode = ProcessLineIntoDetailsAsDetailOrError(keyWorksheet, 
+                                                spreadsheetDetails, lineNumber, inspections, errorSet);
                 if (returnedStatusCode == InspectionsStatusCode.ProcessedWithErrors)
                     statusCode = InspectionsStatusCode.ProcessedWithErrors;
             }
@@ -91,16 +95,19 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             return new InspectionOutcomesResponse {InspectionOutcomes = inspections, InspectionOutcomeErrors = errorSet, StatusCode = statusCode};
         }
 
-        private InspectionsStatusCode ProcessLineIntoDetailsAsDetailOrError(ExcelWorksheet keyWorksheet, int lineNumber, 
+        private InspectionsStatusCode ProcessLineIntoDetailsAsDetailOrError(ExcelWorksheet keyWorksheet,
+            SpreadsheetDetails spreadsheetDetails,
+            int lineNumber, 
             ICollection<InspectionOutcome> inspections, ICollection<InspectionError> errorSet)
         {
             var error = new InspectionError {LineNumber = lineNumber};
 
-            var ukprn = ProcessUkprnForError(Convert.ToString(keyWorksheet.Cells[lineNumber, UkprnPosition].Value), error);
-            var url = _processExcelFormulaToLink.GetLinkFromFormula(keyWorksheet.Cells[lineNumber, WebLinkPosition].Formula, keyWorksheet.Cells[lineNumber, WebLinkPosition].Text);
-            var overallEffectiveness = ProcessOverallEffectivenessForError(Convert.ToString(keyWorksheet.Cells[lineNumber, OverallEffectivenessPosition]?.Value), error);
-
-            var datePublished = ProcessDatePublishedForError(keyWorksheet.Cells[lineNumber, DatePublishedPosition], error);
+            var ukprn = ProcessUkprnForError(Convert.ToString(keyWorksheet.Cells[lineNumber, spreadsheetDetails.UkPrnColumn].Value), error);
+            var url = _processExcelFormulaToLink.GetLinkFromFormula(
+                        keyWorksheet.Cells[lineNumber, spreadsheetDetails.WebLinkColumn].Formula, 
+                        keyWorksheet.Cells[lineNumber, spreadsheetDetails.WebLinkColumn].Text);
+            var overallEffectiveness = ProcessOverallEffectivenessForError(Convert.ToString(keyWorksheet.Cells[lineNumber, spreadsheetDetails.OverallEffectivenessColumn]?.Value), error);
+            var datePublished = ProcessDatePublishedForError(keyWorksheet.Cells[lineNumber, spreadsheetDetails.DatePublishedColumn], error);
 
             if (ukprn != null && overallEffectiveness != null && datePublished != null)
             {
@@ -110,26 +117,58 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                 return InspectionsStatusCode.Success;
             }
 
-            error.Website = url;
+            error.Website = url ?? string.Empty;
+
             errorSet.Add(error);
-            _logger.Warn($"Details processed unsuccessfully for line {error.LineNumber}: '{error.LineNumber}', '{error.Website}', '{error.DatePublished}', '{error.OverallEffectiveness}'");
+            _logger.Warn($"Details processed unsuccessfully for line {error.LineNumber}: '{error.Ukprn}', '{error.Website}', '{error.DatePublished}', '{error.OverallEffectiveness}'");
             return InspectionsStatusCode.ProcessedWithErrors;
 
         }
 
-
-        private static int FindStartingLineNumber(ExcelWorksheet keyWorksheet)
+        private SpreadsheetDetails GetSpreadsheetColumnAndRowDetails(ExcelWorksheet keyWorksheet)
         {
+            var spreadsheetDetails = new SpreadsheetDetails();
+            var matchFound = false;
             var lineNumberStart = keyWorksheet.Dimension.Start.Row;
-            int intValue;
-            while (!int.TryParse(keyWorksheet.Cells[lineNumberStart, UkprnPosition]?.Value?.ToString(), out intValue) &&
-                   GetDateTimeValue(keyWorksheet.Cells[lineNumberStart, DatePublishedPosition]) == null && lineNumberStart<= keyWorksheet.Dimension.End.Row)
+            while (!matchFound && lineNumberStart <= keyWorksheet.Dimension.End.Row)
             {
+                for (var i = 1; i <= keyWorksheet.Dimension.End.Column; i++)
+                {
+                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.WebLinkHeading)
+                    {
+                        spreadsheetDetails.WebLinkColumn = i;
+                        matchFound = true;
+                    }
+
+                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.UkPrnHeading)
+                    {
+                        spreadsheetDetails.UkPrnColumn = i;
+                        matchFound = true;
+                    }
+                    
+                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.DatePublishedHeading)
+                    {
+                        spreadsheetDetails.DatePublishedColumn = i;
+                        matchFound = true;
+                    }
+
+                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.OverallEffectivenessHeading)
+                    {
+                        spreadsheetDetails.OverallEffectivenessColumn = i;
+                        matchFound = true;
+                    }
+                }
                 lineNumberStart++;
             }
-            return lineNumberStart > keyWorksheet.Dimension.End.Row ? 0 : lineNumberStart;
-        }
 
+            if (matchFound)
+            {
+                spreadsheetDetails.DataStartsRow = lineNumberStart;
+            }
+            
+            return spreadsheetDetails;
+        }
+        
         private static void AddInspectionData(int ukprn, string url, DateTime? datePublished,
             OverallEffectiveness overallEffectiveness, ICollection<InspectionOutcome> inspections)
         {
@@ -197,5 +236,14 @@ namespace Esfa.Ofsted.Inspection.Client.Services
                      
             return value as DateTime?;
         }
+    }
+
+    internal struct SpreadsheetDetails
+    {
+        public int WebLinkColumn { get; set; }
+        public int UkPrnColumn { get; set; }
+        public int DatePublishedColumn { get; set; }
+        public int OverallEffectivenessColumn { get; set; }
+        public int DataStartsRow { get; set; }
     }
 }

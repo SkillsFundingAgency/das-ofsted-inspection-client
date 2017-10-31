@@ -44,43 +44,6 @@ namespace Esfa.Ofsted.Inspection.UnitTests
         }
 
         [Test]
-        public void ShouldErrorAsInvalidIfLineNumberStartNotFound()
-        {
-            var excelPackage = CreateBasicExcelSpreadsheetForTesting();
-
-            const string hyperlink = "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
-
-            const string focusWorksheet = "worksheet with details";
-            var mockConfigurationSettings = new Mock<IConfigurationSettings>();
-            mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(focusWorksheet);
-
-            var mockLogger = new Mock<ILogFunctions>();
-            var errorMessageString = string.Empty;
-            Exception errorException = null;
-            var errorAction = new Action<string, Exception>((message, exception) =>
-            {
-                errorMessageString = message;
-                errorException = exception;
-            });
-            mockLogger.SetupGet(x => x.Error).Returns(errorAction);
-
-            var getOfstedDetailsFromExcelPackageService
-                = new GetOfstedDetailsFromExcelPackageService(mockLogger.Object, Mock.Of<IProcessExcelFormulaToLink>(),
-                    Mock.Of<IOverallEffectivenessProcessor>(), mockConfigurationSettings.Object);
-
-            var excelWorksheet = excelPackage.Workbook.Worksheets[2];
-            CreateRow(excelWorksheet, 5, hyperlink, string.Empty, string.Empty, "abc");
-            CreateRow(excelWorksheet, 6, "random", string.Empty, string.Empty, "zed");
-
-             Assert.Throws<MissingInspectionOutcomesException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
-            mockLogger.Verify(x => x.Error, Times.Exactly(1));
-            Assert.IsTrue(errorMessageString.Equals("No details could be found when processing"), "Logged Error message does not contain expected words");
-            Assert.IsNotNull(errorException);
-            Assert.IsTrue(errorException.Message.Equals("No details could be found when processing"), "Exception message does not contain expected words");
-        }
-
-
-        [Test]
         public void ShouldReturnSuccessWithExpectedNumberOfDetailsAndNoErrors()
         {
             const string hyperlink = "=HYPERLINK(\"http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/54805  \",\"Ofsted Webpage\")";
@@ -93,7 +56,11 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
-
+            mockConfigurationSettings.Setup(x => x.WebLinkHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.UkPrnHeading).Returns("Provider UKPRN");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Date published");
+            mockConfigurationSettings.Setup(x => x.OverallEffectivenessHeading).Returns("Overall effectiveness");
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns((string)null);
 
@@ -142,7 +109,11 @@ namespace Esfa.Ofsted.Inspection.UnitTests
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
-
+            mockConfigurationSettings.Setup(x => x.WebLinkHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.UkPrnHeading).Returns("Provider UKPRN");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Date published");
+            mockConfigurationSettings.Setup(x => x.OverallEffectivenessHeading).Returns("Overall effectiveness");
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(),It.IsAny<string>())).Returns((string)null);
  
@@ -199,13 +170,17 @@ namespace Esfa.Ofsted.Inspection.UnitTests
             var excelWorksheet = excelPackage.Workbook.Worksheets[FocusWorksheet];
 
 
-            CreateRow(excelWorksheet, 7, "random words", "", new DateTime(2017,09,29), "4");
-            CreateRow(excelWorksheet, 8, "random", "10033442", "date goes here", "9");
-            CreateRow(excelWorksheet, 9, "random", "10033443", new DateTime(2017,09,28), "x");
+            CreateRow(excelWorksheet, 5, "random words", "", new DateTime(2017,09,29), "4");
+            CreateRow(excelWorksheet, 6, "random", "10033442", "date goes here", "9");
+            CreateRow(excelWorksheet, 7, "random", "10033443", new DateTime(2017,09,28), "x");
 
             var mockConfigurationSettings = new Mock<IConfigurationSettings>();
             mockConfigurationSettings.Setup(x => x.WorksheetName).Returns(FocusWorksheet);
-
+            mockConfigurationSettings.Setup(x => x.WebLinkHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.UkPrnHeading).Returns("Provider UKPRN");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Web link");
+            mockConfigurationSettings.Setup(x => x.DatePublishedHeading).Returns("Date published");
+            mockConfigurationSettings.Setup(x => x.OverallEffectivenessHeading).Returns("Overall effectiveness");
             var mockProcessExcelFormulaToLink = new Mock<IProcessExcelFormulaToLink>();
             mockProcessExcelFormulaToLink.Setup(x => x.GetLinkFromFormula(It.IsAny<string>(), It.IsAny<string>())).Returns(string.Empty);
      
@@ -236,41 +211,42 @@ namespace Esfa.Ofsted.Inspection.UnitTests
                     mockOverallEffectivenessProcessor.Object, mockConfigurationSettings.Object);
 
             Assert.Throws<MissingInspectionOutcomesException>(() => getOfstedDetailsFromExcelPackageService.ExtractOfstedInspections(excelPackage));
-            mockLogger.Verify(x => x.Warn, Times.Exactly(3));
+            mockLogger.Verify(x => x.Warn, Times.Exactly(3));   
             mockLogger.Verify(x => x.Error, Times.Exactly(1));
             Assert.IsTrue(errorMessageString.Equals("No inspections were processed successfully"), "Logged Error message does not contain expected words");
             Assert.IsNotNull(errorException);
-            Assert.AreEqual(3,errorException.Data.Values.Count);
+            Assert.AreEqual(3,errorException.Data.Values.Count); 
             
+            var inspectionErrorOnLine5 = (InspectionError)errorException.Data["5"];
             var inspectionErrorOnLine7 = (InspectionError)errorException.Data["7"];
-            var inspectionErrorOnLine9 = (InspectionError)errorException.Data["9"];
-            Assert.AreEqual(string.Empty, inspectionErrorOnLine7.Website);   
-            Assert.AreEqual("", inspectionErrorOnLine7.Ukprn);
-            Assert.AreEqual(new DateTime(2017, 09, 29).ToString("dd/MM/yyyy",CultureInfo.InvariantCulture), inspectionErrorOnLine7.DatePublished);   
-            Assert.AreEqual("4", inspectionErrorOnLine7.OverallEffectiveness);
-            Assert.IsNotEmpty(inspectionErrorOnLine7.Message);
+            Assert.AreEqual(string.Empty, inspectionErrorOnLine5.Website);   
+            Assert.AreEqual("", inspectionErrorOnLine5.Ukprn);
+            Assert.AreEqual(new DateTime(2017, 09, 29).ToString("dd/MM/yyyy",CultureInfo.InvariantCulture), inspectionErrorOnLine5.DatePublished);   
+            Assert.AreEqual("4", inspectionErrorOnLine5.OverallEffectiveness);
+            Assert.IsNotEmpty(inspectionErrorOnLine5.Message);
 
-            Assert.AreEqual(string.Empty, inspectionErrorOnLine9.Website);
-            Assert.AreEqual("10033443", inspectionErrorOnLine9.Ukprn);
-            Assert.AreEqual(new DateTime(2017, 09, 28).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture), inspectionErrorOnLine9.DatePublished);
-            Assert.AreEqual("x", inspectionErrorOnLine9.OverallEffectiveness);
-            Assert.IsNotEmpty(inspectionErrorOnLine9.Message);
+            Assert.AreEqual(string.Empty, inspectionErrorOnLine7.Website);
+            Assert.AreEqual("10033443", inspectionErrorOnLine7.Ukprn);
+            Assert.AreEqual(new DateTime(2017, 09, 28).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture), inspectionErrorOnLine7.DatePublished);
+            Assert.AreEqual("x", inspectionErrorOnLine7.OverallEffectiveness);
+            Assert.IsNotEmpty(inspectionErrorOnLine7.Message);
     
             Assert.IsTrue(errorException.Message.Equals("No inspections were processed successfully"), "Exception message does not contain expected words");
         }
 
-        private ExcelPackage CreateBasicExcelSpreadsheetForTesting()
+        private static ExcelPackage CreateBasicExcelSpreadsheetForTesting()
         {
             var excelPackage = new ExcelPackage();
+            var configurationSettings = new ConfigurationSettings();
 
             excelPackage.Workbook.Worksheets.Add("worksheet 1");
             var excelWorksheet = excelPackage.Workbook.Worksheets.Add(FocusWorksheet);
             excelWorksheet.Cells[1, 1].Value =
                 "In-year full and short inspection outcomes for further education and skills providers";
-            excelWorksheet.Cells[4, 1].Value = "Web link";
-            excelWorksheet.Cells[4, 3].Value = "Provider UKPRN";
-            excelWorksheet.Cells[4, 16].Value = "Date published";
-            excelWorksheet.Cells[4, 17].Value = "Overall effectiveness";
+            excelWorksheet.Cells[4, 1].Value = configurationSettings.WebLinkHeading;
+            excelWorksheet.Cells[4, 3].Value = configurationSettings.UkPrnHeading;
+            excelWorksheet.Cells[4, 16].Value = configurationSettings.DatePublishedHeading;
+            excelWorksheet.Cells[4, 17].Value = configurationSettings.OverallEffectivenessHeading;
             return excelPackage;
         }
 
