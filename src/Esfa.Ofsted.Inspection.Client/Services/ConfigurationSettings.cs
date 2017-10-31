@@ -1,17 +1,18 @@
-﻿using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
+﻿using System.Configuration;
+using Esfa.Ofsted.Inspection.Client.Services.Interfaces;
 
 namespace Esfa.Ofsted.Inspection.Client.Services
 {
     internal class ConfigurationSettings : IConfigurationSettings
     {
-        public string LinkText => ConfigurationResources.LinkText;
-        public string InspectionSiteUrl => ConfigurationResources.InspectionSiteUrl;
-        public string WorksheetName => ConfigurationResources.WorksheetName;
-
-        public string WebLinkHeading => "Web link";
-        public string UkPrnHeading => "Provider UKPRN";
-        public string DatePublishedHeading => "Date published";
-        public string OverallEffectivenessHeading => "Overall effectiveness";
+   
+        public string LinkText => ConfigurationManager.AppSettings["LinkText"];
+        public string InspectionSiteUrl => ConfigurationManager.AppSettings["InspectionSiteUrl"];
+        public string WorksheetName => ConfigurationManager.AppSettings["WorksheetName"];
+        public string WebLinkHeading => ConfigurationManager.AppSettings["WebLinkHeading"];
+        public string UkPrnHeading => ConfigurationManager.AppSettings["UkPrnHeading"];
+        public string DatePublishedHeading => ConfigurationManager.AppSettings["DatePublishedHeading"];
+        public string OverallEffectivenessHeading => ConfigurationManager.AppSettings["OverallEffectivenessHeading"];
 
     }
 }
