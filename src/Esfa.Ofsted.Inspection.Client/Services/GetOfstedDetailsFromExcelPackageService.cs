@@ -59,13 +59,9 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var spreadsheetDetails = GetSpreadsheetColumnAndRowDetails(keyWorksheet);
            
 
-            if (spreadsheetDetails.WebLinkColumn== 0
-                || spreadsheetDetails.UkPrnColumn == 0
-                || spreadsheetDetails.DatePublishedColumn == 0
-                || spreadsheetDetails.OverallEffectivenessColumn == 0
-                || spreadsheetDetails.DataStartsRow == 0)
+            if (!spreadsheetDetails.AreAllColumnHeadingsMatched || spreadsheetDetails.DataStartsRow == 0)
             {
-                const string message = "No details could be found when processing";
+                const string message = "Could not find the start row or the column names";
                 var exception = new MissingInspectionOutcomesException(message);  
                 _logger.Error(message, exception);
                 throw exception;
@@ -128,43 +124,46 @@ namespace Esfa.Ofsted.Inspection.Client.Services
         private SpreadsheetDetails GetSpreadsheetColumnAndRowDetails(ExcelWorksheet keyWorksheet)
         {
             var spreadsheetDetails = new SpreadsheetDetails();
-            var matchFound = false;
-            var lineNumberStart = keyWorksheet.Dimension.Start.Row;
-            while (!matchFound && lineNumberStart <= keyWorksheet.Dimension.End.Row)
+            var rowNumber = keyWorksheet.Dimension.Start.Row;
+            var maxRow = keyWorksheet.Dimension.End.Row;
+            var maxCol = keyWorksheet.Dimension.End.Column;
+            while (rowNumber <= maxRow)
             {
-                for (var i = 1; i <= keyWorksheet.Dimension.End.Column; i++)
+                for (var columnNumber = 1; columnNumber <= maxCol && !spreadsheetDetails.AreAllColumnHeadingsMatched; columnNumber++)
                 {
-                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.WebLinkHeading)
+                    var cellValue = keyWorksheet.Cells[rowNumber, columnNumber]?.Value?.ToString().Trim();
+
+                    if (string.Equals(cellValue, _configurationSettings.WebLinkHeading, StringComparison.OrdinalIgnoreCase))
                     {
-                        spreadsheetDetails.WebLinkColumn = i;
-                        matchFound = true;
+                        spreadsheetDetails.WebLinkColumn = columnNumber;
                     }
 
-                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.UkPrnHeading)
+                    if (string.Equals(cellValue, _configurationSettings.UkPrnHeading, StringComparison.OrdinalIgnoreCase))
                     {
-                        spreadsheetDetails.UkPrnColumn = i;
-                        matchFound = true;
-                    }
-                    
-                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.DatePublishedHeading)
-                    {
-                        spreadsheetDetails.DatePublishedColumn = i;
-                        matchFound = true;
+                        spreadsheetDetails.UkPrnColumn = columnNumber;
                     }
 
-                    if (keyWorksheet.Cells[lineNumberStart, i]?.Value?.ToString() == _configurationSettings.OverallEffectivenessHeading)
+                    if (string.Equals(cellValue, _configurationSettings.DatePublishedHeading, StringComparison.OrdinalIgnoreCase))
                     {
-                        spreadsheetDetails.OverallEffectivenessColumn = i;
-                        matchFound = true;
+                        spreadsheetDetails.DatePublishedColumn = columnNumber;
+                    }
+
+                    if (string.Equals(cellValue, _configurationSettings.OverallEffectivenessHeading, StringComparison.OrdinalIgnoreCase))
+                    {
+                        spreadsheetDetails.OverallEffectivenessColumn = columnNumber;
                     }
                 }
-                lineNumberStart++;
+                rowNumber++;
+
+                if (spreadsheetDetails.AreAllColumnHeadingsMatched)
+                {
+                    spreadsheetDetails.DataStartsRow = rowNumber;
+                    break;
+                }
+
             }
 
-            if (matchFound)
-            {
-                spreadsheetDetails.DataStartsRow = lineNumberStart;
-            }
+           
             
             return spreadsheetDetails;
         }
@@ -229,21 +228,12 @@ namespace Esfa.Ofsted.Inspection.Client.Services
             var value = excelRange?.Value;
             var valueToCheck = value as string;
 
-            if (valueToCheck == "null" || valueToCheck == "NULL"|| valueToCheck == "Null")
+            if (string.Equals(valueToCheck, "null", StringComparison.OrdinalIgnoreCase))
             {
                 return DateTime.MinValue;
             }
                      
             return value as DateTime?;
         }
-    }
-
-    internal struct SpreadsheetDetails
-    {
-        public int WebLinkColumn { get; set; }
-        public int UkPrnColumn { get; set; }
-        public int DatePublishedColumn { get; set; }
-        public int OverallEffectivenessColumn { get; set; }
-        public int DataStartsRow { get; set; }
     }
 }

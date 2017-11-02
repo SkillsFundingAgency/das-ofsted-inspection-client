@@ -74,6 +74,7 @@
     <Compile Include="Services\Interfaces\IWebClientFactory.cs" />
     <Compile Include="Services\OverallEffectivenessProcessor.cs" />
     <Compile Include="Services\ProcessExcelFormulaToLink.cs" />
+    <Compile Include="Services\SpreadsheetDetails.cs" />
     <Compile Include="Services\SystemWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
