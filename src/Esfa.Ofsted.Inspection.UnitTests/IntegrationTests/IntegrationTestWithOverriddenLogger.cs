@@ -12,7 +12,6 @@ namespace Esfa.Ofsted.Inspection.UnitTests.IntegrationTests
         [Test]
         public void TestWithoutLogger()
         {
-
             _processedWithLog = false;
             var inspectionOutcomesResponse = new OfstedInspectionsClient().GetOfstedInspectionOutcomes();
             Assert.IsFalse(_processedWithLog);

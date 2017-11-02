@@ -5,5 +5,9 @@
         string LinkText { get; }
         string InspectionSiteUrl { get; }
         string WorksheetName { get; }
+        string WebLinkHeading { get; }
+        string UkPrnHeading { get; }
+        string DatePublishedHeading { get; }
+        string OverallEffectivenessHeading { get; }
     }
 }
